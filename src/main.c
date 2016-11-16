@@ -17,7 +17,7 @@ int tun_alloc(char* dev)
 
     if( (fd = open("/dev/net/tun",O_RDWR)) < 0)
     {
-        printf("ERROR: Could not open TUN/TAP dev");
+        printf("ERROR: Could not open TUN/TAP dev\n");
         exit(1);
     }
 
@@ -29,7 +29,7 @@ int tun_alloc(char* dev)
          *
          *        IFF_NO_PI - Do not provide packet information
          */
-    ifr.ifr_flags = IFF_TUN;
+    ifr.ifr_flags = IFF_TUN;//IFF_TAP | IFF_NO_PI;
     if( *dev )
     {
         strncpy(ifr.ifr_name, dev, IFNAMSIZ);
@@ -53,9 +53,14 @@ sudo ip tuntap add mode tun dev tun0
 sudo ip addr add 10.0.0.0/24 dev tun0  # give it an ip
 sudo ip link set dev tun0 up  # bring the if up
 sudo ip route get 10.0.0.2  # check that packets to 10.0.0.x are going through tun0
+
 ping 10.0.0.2  # leave this running in another shell to be able to see the effect of the next example
 
 
+
+sudo ip tuntap add mode tap dev tap0
+sudo ip link set dev tap0 up  # bring the if up
+sudo ip route add dev tun0 10.0.0.0/24
 */
 
 

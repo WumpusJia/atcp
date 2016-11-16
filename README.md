@@ -1,5 +1,4 @@
 # atcp
-Linux userspace(kernel bypassing) TCP/IP stack. 
+Linux userspace TCP/IP stack. 
 
 Implemented with TUN/TAP
-
