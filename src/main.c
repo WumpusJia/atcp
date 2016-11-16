@@ -44,19 +44,7 @@ int tun_alloc(char* dev)
     return fd;
 }
 
-#define CMD_MAX_LEN 256
 
-int cmd_run(char* format, ...)
-{
-    char buf[CMD_MAX_LEN];
-    va_list ap;
-    va_start(ap,format);
-    vsnprintf(buf,CMD_MAX_LEN,format,ap);
-    va_end(ap);
-
-    printf("RUN: %s\n",buf);
-    return system(buf);
-}
 
 
 /*
@@ -88,4 +76,3 @@ int main()
     }
 
 }
-
