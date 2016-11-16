@@ -59,6 +59,9 @@ ping 10.0.0.2  # leave this running in another shell to be able to see the effec
 */
 
 
+
+
+
 int main()
 {
     int tun_fd;
@@ -72,7 +75,7 @@ int main()
     while(1)
     {
         int len = read(tun_fd,buf,sizeof(buf));
-        printf("%d\n",len);
+        hex_print(buf,len);
     }
 
 }

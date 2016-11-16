@@ -15,3 +15,12 @@ int my_cmd_run(char* format, ...)
     printf("RUN: %s\n",buf);
     return system(buf);
 }
+
+void hex_print(char *s,int len)
+{
+    puts("Hex Print:");
+    for(int i = 0;i < len;++i)
+    {
+        printf("%02x%c",(unsigned char)s[i]," \n"[(i % 8 == 0) || i == len-1]);
+    }
+}
