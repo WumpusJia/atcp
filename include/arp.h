@@ -21,17 +21,27 @@ struct arp_header
 
     uint16_t op;
 
-    unsigned char shaddr[ETH_LEN];
-    uint32_t spaddr;
+    unsigned char srcmac[ETH_LEN];
+    uint32_t srcip;
     //unsigned char src_prot_addr[4];
-    unsigned char dhaddr[ETH_LEN];
+    unsigned char dstmac[ETH_LEN];
     //unsigned char dst_prot_addr[4];
-    uint32_t dpaddr;
+    uint32_t dstip;
 }__attribute__((packed));
 
 
 
+#define ARP_CACHE_SIZE 20
+
+struct arp_cache_node
+{
+    unsigned int isused;
+    uint16_t htype;
+    uint32_t ip;
+    unsigned char mac[ETH_LEN];
+};
 
 void arp_solve(struct eth_header* hdr);
-
+void arp_cache_init();
+int update_arp_cache(struct arp_header * hdr);
 #endif

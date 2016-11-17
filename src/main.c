@@ -81,6 +81,8 @@ int main()
 
     char buf[1600];
 
+    arp_cache_init();
+
 
     while(1)
     {
