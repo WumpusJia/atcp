@@ -21,18 +21,14 @@ struct arp_header
 
     uint16_t op;
 
-    unsigned char payload[];
-
-};
-
-
-struct arp_ipv4
-{
-    unsigned char src_hard_addr[6];
+    unsigned char src_hard_addr[ETH_LEN];
     unsigned char src_prot_addr[4];
-    unsigned char dst_hard_addr[6];
+    unsigned char dst_hard_addr[ETH_LEN];
     unsigned char dst_prot_addr[4];
+
 };
+
+
 
 
 void arp_solve(struct eth_header* hdr);

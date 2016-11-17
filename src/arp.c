@@ -19,8 +19,6 @@ void arp_solve(struct eth_header* hdr)
     //Suppose prot_type = 0x8000 (ipv4);
     assert(arphdr->prot_type == PROT_TYPE_IPV4);
 
-    struct arp_ipv4 * arpipv4;
-    arpipv4 = (struct arp_ipv4*) arphdr->payload;
 
     printf("OP : %04x\n",arphdr->op);
 

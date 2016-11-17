@@ -5,12 +5,12 @@ void eth_print(struct eth_header* hdr)
 {
     puts("Print Ethernet Header:");
     printf("DST: ");
-    for(int i = 0;i < 6;++i)
+    for(int i = 0;i < ETH_LEN;++i)
         printf("%02x ",hdr->daddr[i]);
     putchar('\n');
 
     printf("SRC: ");
-    for(int i = 0;i < 6;++i)
+    for(int i = 0;i < ETH_LEN;++i)
         printf("%02x ",hdr->saddr[i]);
     putchar('\n');
 

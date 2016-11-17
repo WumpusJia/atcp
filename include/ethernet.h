@@ -4,11 +4,12 @@
 #include "common.h"
 
 
+#define ETH_LEN 6
 
 struct eth_header
 {
-    unsigned char daddr[6];
-    unsigned char saddr[6];
+    unsigned char daddr[ETH_LEN];
+    unsigned char saddr[ETH_LEN];
     uint16_t type;
     unsigned char payload[];
 
