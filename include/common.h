@@ -11,7 +11,8 @@
 #include<string.h>
 #include<stdarg.h>
 #include<errno.h>
-
-#include <arpa/inet.h>
+#include<stdint.h>
+#include<arpa/inet.h>
+#include<assert.h>
 
 #endif
