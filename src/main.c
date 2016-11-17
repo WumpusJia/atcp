@@ -2,41 +2,10 @@
 #include "util.h"
 #include "ethernet.h"
 #include "arp.h"
+#include "tuntap.h"
 
 
-int tun_alloc(char* dev)
-{
-    struct ifreq ifr;
-    int fd,err;
 
-    if( (fd = open("/dev/net/tun",O_RDWR)) < 0)
-    {
-        printf("ERROR: Could not open TUN/TAP dev\n");
-        exit(1);
-    }
-
-
-    memset(&ifr,0,sizeof(ifr));
-
-    /* Flags: IFF_TUN   - TUN device (no Ethernet headers)
-         *        IFF_TAP   - TAP device
-         *
-         *        IFF_NO_PI - Do not provide packet information
-         */
-    ifr.ifr_flags = IFF_TAP | IFF_NO_PI;
-    if( *dev )
-    {
-        strncpy(ifr.ifr_name, dev, IFNAMSIZ);
-    }
-    if( (err = ioctl(fd, TUNSETIFF, (void *) &ifr)) < 0 )
-    {
-        printf("ERROR: Could not ioctl %s",strerror(errno));
-        close(fd);
-        return err;
-    }
-    strcpy(dev, ifr.ifr_name);
-    return fd;
-}
 
 
 
@@ -77,7 +46,7 @@ int main()
 {
     int tun_fd;
     char dev[] = "tap0";
-    tun_fd = tun_alloc(dev);
+    tun_init(dev);
 
     char buf[1600];
 
@@ -86,7 +55,7 @@ int main()
 
     while(1)
     {
-        int len = read(tun_fd,buf,sizeof(buf));
+        int len = tun_read(buf,sizeof(buf));
         struct eth_header * hdr = init_eth_header(buf);
         eth_print(hdr);
         frame_solve(hdr);
