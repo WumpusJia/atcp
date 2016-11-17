@@ -6,8 +6,8 @@ BUILDDIR = ./build
 CC = gcc
 CFLAGS = -I$(IDIR)
 
-_OBJ = main.o util.o
-_DEPS = util.h
+_OBJ = main.o util.o ethernet.o
+_DEPS = util.h ethernet.h common.h
 
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ) )
 DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))

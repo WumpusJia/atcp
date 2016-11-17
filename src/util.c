@@ -1,6 +1,4 @@
-#include<stdio.h>
-#include<stdarg.h>
-#include<stdlib.h>
+#include "common.h"
 #include "util.h"
 
 
@@ -21,6 +19,6 @@ void hex_print(char *s,int len)
     puts("Hex Print:");
     for(int i = 0;i < len;++i)
     {
-        printf("%02x%c",(unsigned char)s[i]," \n"[(i % 8 == 0) || i == len-1]);
+        printf("%02x%c",(unsigned char)s[i]," \n"[(i && (i % 8 == 0)) || i == len-1]);
     }
 }

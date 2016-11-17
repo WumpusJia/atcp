@@ -1,13 +1,6 @@
-#include<sys/socket.h>
-#include<linux/if.h>
-#include<linux/if_tun.h>
-#include<sys/ioctl.h>
-#include<fcntl.h>
-#include<stdio.h>
-#include<stdlib.h>
-#include<string.h>
-#include<stdarg.h>
-#include<errno.h>
+#include "common.h"
+#include "util.h"
+#include "ethernet.h"
 
 
 int tun_alloc(char* dev)
@@ -29,7 +22,7 @@ int tun_alloc(char* dev)
          *
          *        IFF_NO_PI - Do not provide packet information
          */
-    ifr.ifr_flags = IFF_TUN;//IFF_TAP | IFF_NO_PI;
+    ifr.ifr_flags = IFF_TAP | IFF_NO_PI;
     if( *dev )
     {
         strncpy(ifr.ifr_name, dev, IFNAMSIZ);
@@ -60,27 +53,30 @@ ping 10.0.0.2  # leave this running in another shell to be able to see the effec
 
 sudo ip tuntap add mode tap dev tap0
 sudo ip link set dev tap0 up  # bring the if up
-sudo ip route add dev tun0 10.0.0.0/24
+sudo ip route add dev tap0 10.0.0.0/24
 */
 
 
 
-
+struct T
+{
+    short val;
+};
 
 int main()
 {
     int tun_fd;
-    char dev[] = "tun0";
+    char dev[] = "tap0";
     tun_fd = tun_alloc(dev);
-
-
 
     char buf[1600];
 
     while(1)
     {
         int len = read(tun_fd,buf,sizeof(buf));
-        hex_print(buf,len);
+        struct eth_header * hdr = init_eth_header(buf);
+        eth_print(hdr);
+        //hex_print(buf,len);
     }
 
 }
