@@ -14,19 +14,20 @@
 
 struct arp_header
 {
-    uint16_t hard_type;
-    uint16_t prot_type;
-    unsigned char hard_size;
-    unsigned char prot_size;
+    uint16_t htype;
+    uint16_t ptype;
+    unsigned char hsize;
+    unsigned char psize;
 
     uint16_t op;
 
-    unsigned char src_hard_addr[ETH_LEN];
-    unsigned char src_prot_addr[4];
-    unsigned char dst_hard_addr[ETH_LEN];
-    unsigned char dst_prot_addr[4];
-
-};
+    unsigned char shaddr[ETH_LEN];
+    uint32_t spaddr;
+    //unsigned char src_prot_addr[4];
+    unsigned char dhaddr[ETH_LEN];
+    //unsigned char dst_prot_addr[4];
+    uint32_t dpaddr;
+}__attribute__((packed));
 
 
 

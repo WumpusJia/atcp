@@ -9,17 +9,22 @@ void arp_solve(struct eth_header* hdr)
     struct arp_header * arphdr;
     arphdr = (struct arp_header *) hdr->payload;
 
-    arphdr->hard_type = ntohs(arphdr->hard_type);
-    arphdr->prot_type = ntohs(arphdr->prot_type);
+    arphdr->htype = ntohs(arphdr->htype);
+    arphdr->ptype = ntohs(arphdr->ptype);
     arphdr->op = ntohs(arphdr->op);
 
+    arphdr->spaddr = ntohl(arphdr->spaddr);
+    arphdr->dpaddr = ntohl(arphdr->dpaddr);
+
     //Suppose hard_type = 1 (ethernet)
-    assert(arphdr->hard_type == HARD_TYPE_ETH);
+    assert(arphdr->htype == HARD_TYPE_ETH);
 
     //Suppose prot_type = 0x8000 (ipv4);
-    assert(arphdr->prot_type == PROT_TYPE_IPV4);
+    assert(arphdr->ptype == PROT_TYPE_IPV4);
 
 
-    printf("OP : %04x\n",arphdr->op);
+    uint32_t num = arphdr->spaddr;
+    printf("SRC %u\n",num);
+    //printf("SRC IP: %u,%u,%u,%u\n",(num/256/256/256)%256,(num/256/256)%256,(num/256)%256,num%256);
 
 }

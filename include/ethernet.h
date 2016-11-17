@@ -13,7 +13,7 @@ struct eth_header
     uint16_t type;
     unsigned char payload[];
 
-};
+}__attribute__((packed));;
 
 void eth_print(struct eth_header* hdr);
 struct eth_header* init_eth_header(char * buf);
