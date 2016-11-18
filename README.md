@@ -20,12 +20,22 @@ Implemented with TUN/TAP.
     sudo ip address add dev tap0 local 10.0.0.3/24
 ```
 
+* Download atcp　
+* Compile and run
+```
+	cd atcp
+    make
+    ./build/atcp
+```
+
+
 _If you prefer a temporary tap dev, just read this [article](http://backreference.org/2010/03/26/tuntap-interface-tutorial/). Do a liitle change to code and run it with sudo_
 
 
 ##Progress
 
 Finished basic arp reply
+
 Test:
 ```
 	$ arping -I tap0 10.0.0.2
