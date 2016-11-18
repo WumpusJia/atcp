@@ -21,10 +21,10 @@ struct arp_header
 
     uint16_t op;
 
-    uint8_t srcmac[ETH_LEN];
+    uint8_t srcmac[ETH_MAC_LEN];
     uint32_t srcip;
     //unsigned char src_prot_addr[4];
-    uint8_t dstmac[ETH_LEN];
+    uint8_t dstmac[ETH_MAC_LEN];
     //unsigned char dst_prot_addr[4];
     uint32_t dstip;
 }__attribute__((packed));
@@ -38,7 +38,7 @@ struct arp_cache_node
     uint32_t isused;
     uint16_t htype;
     uint32_t ip;
-    uint8_t mac[ETH_LEN];
+    uint8_t mac[ETH_MAC_LEN];
 };
 
 void arp_reply();

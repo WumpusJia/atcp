@@ -66,7 +66,7 @@ int update_arp_cache(struct arp_header * hdr)
         {
             if(now->htype == hdr->htype && now->ip == hdr->srcip)
             {
-                memcpy(now->mac,hdr->srcmac,ETH_LEN);
+                memcpy(now->mac,hdr->srcmac,ETH_MAC_LEN);
                 return 1;
             }
         }

@@ -18,49 +18,19 @@ struct sk_buff
 };
 
 struct sk_buff * alloc_skb(uint32_t datasize);
-void skb_free(struct sk_buff* skb);
+void free_skb(struct sk_buff* skb);
 
 
 
-static inline uint8_t* __skb_put(struct sk_buff* skb,uint32_t len)
-{
-    uint8_t *tmp = skb->tail;
-    skb->tail += len;
-    skb->len += len;
-    return tmp;
-}
+static  uint8_t* __skb_put(struct sk_buff* skb,uint32_t len);
+static  uint8_t * __skb_push(struct sk_buff * skb,uint32_t len);
 
-static inline uint8_t * __skb_push(struct sk_buff * skb,uint32_t len)
-{
-    skb->data -= len;
-    skb->len += len;
-    return skb->data;
-}
+static  uint8_t* __skb_pull(struct sk_buff *skb,uint32_t len);
+uint8_t* skb_put(struct sk_buff* skb,uint32_t len);
 
-static inline uint8_t* __skb_pull(struct sk_buff *skb,uint32_t len)
-{
-    skb->len -= len;
-    return skb->data += len;
-}
-
-inline uint8_t* skb_put(struct sk_buff* skb,uint32_t len)
-{
-    return __skb_put(skb,len);
-}
-
-inline uint8_t * skb_push(struct sk_buff * skb,uint32_t len)
-{
-    return __skb_push(skb,len);
-}
-inline uint8_t* skb_pull(struct sk_buff *skb,uint32_t len)
-{
-    return __skb_pull(skb,len);
-}
-inline void skb_reverse(struct sk_buff* skb,uint32_t len)
-{
-    skb->data += len;
-    skb->tail += len;
-}
+uint8_t * skb_push(struct sk_buff * skb,uint32_t len);
+uint8_t* skb_pull(struct sk_buff *skb,uint32_t len);
+void skb_reverse(struct sk_buff* skb,uint32_t len);
 
 
 #endif
