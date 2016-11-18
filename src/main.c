@@ -3,7 +3,7 @@
 #include "ethernet.h"
 #include "arp.h"
 #include "tuntap.h"
-
+#include "netdevice.h"
 
 
 
@@ -26,20 +26,20 @@ sudo ip link set dev tap0 up  # bring the if up
 sudo ip route add dev tap0 10.0.0.0/24
 */
 
-
-void frame_solve(struct eth_header* hdr)
-{
-    switch(hdr->type)
-    {
-        case ETH_P_ARP:
-            arp_solve(hdr);
-            break;
-        default:
-            puts("Unknown Frame");
-            break;
-
-    }
-}
+// 
+// void frame_solve(struct eth_header* hdr)
+// {
+//     switch(hdr->type)
+//     {
+//         case ETH_P_ARP:
+//             arp_solve(hdr);
+//             break;
+//         default:
+//             puts("Unknown Frame");
+//             break;
+//
+//     }
+// }
 
 
 int main()
@@ -52,14 +52,14 @@ int main()
 
     arp_cache_init();
 
-
-    while(1)
-    {
-        int len = tun_read(buf,sizeof(buf));
-        struct eth_header * hdr = init_eth_header(buf);
-        eth_print(hdr);
-        frame_solve(hdr);
-        //hex_print(buf,len);
-    }
+    net_rx_loop();
+    // while(1)
+    // {
+    //     int len = tun_read(buf,sizeof(buf));
+    //     struct eth_header * hdr = init_eth_header(buf);
+    //     eth_print(hdr);
+    //     frame_solve(hdr);
+    //     //hex_print(buf,len);
+    // }
 
 }

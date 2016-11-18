@@ -3,8 +3,11 @@
 
 #define MAX_MAC_LEN 6
 
-#include "common.h"
+#define MTU 1500
+
 #include "skbuff.h"
+#include "common.h"
+
 
 struct netdevice
 {
@@ -16,7 +19,9 @@ struct netdevice
 static struct netdevice netdev;
 
 int net_tx_action(struct sk_buff* skb,uint8_t * dst_mac,uint16_t type);
+void net_rx_action(struct sk_buff* skb);
 void netdev_init(char* ip,char *mac);
 
+void net_rx_loop();
 
 #endif

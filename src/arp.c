@@ -2,12 +2,9 @@
 #include "common.h"
 
 
-void arp_solve(struct eth_header* hdr)
+struct arp_header * init_arp_header(struct sk_buff * skb)
 {
-    puts("SOLVE : ARP");
-
-    struct arp_header * arphdr;
-    arphdr = (struct arp_header *) hdr->payload;
+    struct arp_header * arphdr = (struct rarp_header *)skb->data;
 
     arphdr->htype = ntohs(arphdr->htype);
     arphdr->ptype = ntohs(arphdr->ptype);
@@ -16,35 +13,46 @@ void arp_solve(struct eth_header* hdr)
     arphdr->srcip = ntohl(arphdr->srcip);
     arphdr->dstip = ntohl(arphdr->dstip);
 
+    return arphdr;
+}
+
+
+void arp_solve(struct sk_buff* skb)
+{
+    puts("SOLVE : ARP");
+
+    struct arp_header * hdr = init_arp_header(skb);
+
     //Suppose hard_type = 1 (ethernet)
-    assert(arphdr->htype == HARD_TYPE_ETH);
+    assert(hdr->htype == HARD_TYPE_ETH);
 
     //Suppose prot_type = 0x8000 (ipv4);
-    assert(arphdr->ptype == PROT_TYPE_IPV4);
+    assert(hdr->ptype == PROT_TYPE_IPV4);
 
 
-    if(!update_arp_cache(arphdr))
+    if(!update_arp_cache(hdr))
     {
         puts("ARP Cache is Full");
     }
 
-    switch(arphdr->op)
+    switch(hdr->op)
     {
         case OP_ARP_REQUEST:
             arp_reply();
     }
 
-
-    //uint32_t num = arphdr->spaddr;
-    //printf("SRC %u\n",num);
-    //printf("SRC IP: %u,%u,%u,%u\n",(num/256/256/256)%256,(num/256/256)%256,(num/256)%256,num%256);
+    //
+    //
+    // uint32_t num = hdr->srcip;
+    // printf("SRC %u\n",num);
+    // printf("SRC IP: %u,%u,%u,%u\n",(num/256/256/256)%256,(num/256/256)%256,(num/256)%256,num%256);
 
 }
 
 void arp_reply()
 {
 //todo
-
+    puts("ARP: REPLY");
 }
 
 

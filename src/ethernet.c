@@ -19,9 +19,9 @@ void eth_print(struct eth_header* hdr)
 }
 
 
-struct eth_header* init_eth_header(char * buf)
+struct eth_header* init_eth_header(struct sk_buff * skb)
 {
-    struct eth_header* hdr = (struct eth_header *)buf;
+    struct eth_header* hdr = (struct eth_header *)skb->data;
     hdr->type = ntohs(hdr->type);
     return hdr;
 }

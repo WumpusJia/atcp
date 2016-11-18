@@ -2,6 +2,7 @@
 #define ATCP_ETHERNET_H
 
 #include "common.h"
+#include "skbuff.h"
 
 
 #define ETH_HEADER_LEN 14
@@ -17,6 +18,6 @@ struct eth_header
 }__attribute__((packed));;
 
 void eth_print(struct eth_header* hdr);
-struct eth_header* init_eth_header(char * buf);
+struct eth_header* init_eth_header(struct sk_buff * skb);
 
 #endif

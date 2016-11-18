@@ -2,7 +2,7 @@
 #define ATCP_ARP_H
 
 #include "ethernet.h"
-
+#include "skbuff.h"
 
 #define HARD_TYPE_ETH 0x0001
 #define PROT_TYPE_IPV4 0x0800
@@ -30,6 +30,7 @@ struct arp_header
 }__attribute__((packed));
 
 
+struct arp_header * init_arp_header(struct sk_buff * skb);
 
 #define ARP_CACHE_SIZE 20
 
@@ -43,7 +44,7 @@ struct arp_cache_node
 
 void arp_reply();
 
-void arp_solve(struct eth_header* hdr);
+void arp_solve(struct sk_buff* skb);
 void arp_cache_init();
 int update_arp_cache(struct arp_header * hdr);
 #endif
