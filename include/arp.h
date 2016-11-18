@@ -42,7 +42,7 @@ struct arp_cache_node
     uint8_t mac[ETH_MAC_LEN];
 };
 
-void arp_reply();
+void arp_reply(struct sk_buff* skb,struct arp_header* hdr);
 
 void arp_solve(struct sk_buff* skb);
 void arp_cache_init();

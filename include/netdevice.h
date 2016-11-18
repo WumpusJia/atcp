@@ -16,8 +16,7 @@ struct netdevice
     uint32_t ip;
 };
 
-static struct netdevice netdev;
-
+ struct netdevice* netdev_get();
 int net_tx_action(struct sk_buff* skb,uint8_t * dst_mac,uint16_t type);
 void net_rx_action(struct sk_buff* skb);
 void netdev_init(char* ip,char *mac);

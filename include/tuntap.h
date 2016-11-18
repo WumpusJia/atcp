@@ -5,10 +5,9 @@
 
 static int tunfd;
 
-int tun_alloc(char* dev);
 
 
-void tun_init(char* dev);
+void tun_init();
 int tun_read(char* buf,int len);
 int tun_write(char* buf,int len);
 

@@ -1,6 +1,7 @@
 #include "arp.h"
 #include "common.h"
 
+//http://backreference.org/2010/03/26/tuntap-interface-tutorial/  this article introduce TUN/TAP
 
 struct arp_header * init_arp_header(struct sk_buff * skb)
 {
@@ -23,6 +24,8 @@ void arp_solve(struct sk_buff* skb)
 
     struct arp_header * hdr = init_arp_header(skb);
 
+
+
     //Suppose hard_type = 1 (ethernet)
     assert(hdr->htype == HARD_TYPE_ETH);
 
@@ -38,21 +41,48 @@ void arp_solve(struct sk_buff* skb)
     switch(hdr->op)
     {
         case OP_ARP_REQUEST:
-            arp_reply();
+            arp_reply(skb,hdr);
     }
 
-    //
-    //
-    // uint32_t num = hdr->srcip;
-    // printf("SRC %u\n",num);
-    // printf("SRC IP: %u,%u,%u,%u\n",(num/256/256/256)%256,(num/256/256)%256,(num/256)%256,num%256);
+
 
 }
 
-void arp_reply()
+void arp_reply(struct sk_buff* skb,struct arp_header* hdr)
 {
-//todo
     puts("ARP: REPLY");
+    struct netdevice * dev = skb->dev;
+
+    if(dev->ip != hdr->dstip)
+    {
+        puts("Not come for me~");
+        return;
+    }
+
+
+    hdr->dstip = htonl(hdr->srcip);
+    memcpy(hdr->dstmac,hdr->srcmac,sizeof(uint8_t)*ETH_MAC_LEN);
+
+
+
+
+    hdr->srcip = htonl(dev->ip);
+
+    memcpy(hdr->srcmac,dev->mac,sizeof(uint8_t)*ETH_MAC_LEN);
+
+
+    hdr->htype = htons(HARD_TYPE_ETH);
+    hdr->ptype = htons(PROT_TYPE_IPV4);
+
+
+    hdr->hsize = ETH_MAC_LEN;
+    hdr->psize = 4; //todo: repalce with ipv4 const variable
+
+    hdr->op = htons(OP_ARP_REPLY);
+
+
+    net_tx_action(skb,hdr->dstmac,ETH_P_ARP);
+
 }
 
 
