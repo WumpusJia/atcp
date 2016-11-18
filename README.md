@@ -5,12 +5,12 @@ Implemented with TUN/TAP.
 ##Usage:
 * Create device node:
 ```
-	mkdir /dev/net (if it doesn't exist already)
-    mknod /dev/net/tun c 10 200
+	sudo mkdir /dev/net (if it doesn't exist already)
+    sudo mknod /dev/net/tap c 10 200
 ```
 * Set permissions:
 ```
-    e.g. chmod 0666 /dev/net/tun
+    e.g. sudo chmod 0666 /dev/net/tap
 ```
 * Add a new tap dev and configure it(make tap0 persistent)
 ```

@@ -74,7 +74,6 @@ void net_rx_loop()
     {
         struct sk_buff * skb = alloc_skb(MTU);
         uint32_t len = tun_read(skb->data,MTU);
-        printf("**** %u\n",len);
         skb_put(skb,len);
         net_rx_action(skb);
     }

@@ -12,6 +12,9 @@
 #define OP_RARP_REQUEST 0x0003
 #define OP_RARP_REPLY 0x0004
 
+
+#define ARP_HEADER_LEN sizeof(struct arp_header)
+
 struct arp_header
 {
     uint16_t htype;
@@ -42,8 +45,8 @@ struct arp_cache_node
     uint8_t mac[ETH_MAC_LEN];
 };
 
-void arp_reply(struct sk_buff* skb,struct arp_header* hdr);
-
+int arp_reply(struct sk_buff* skb,struct arp_header* hdr);
+int arp_request(struct netdevice* dev,uint32_t reqip);
 void arp_solve(struct sk_buff* skb);
 void arp_cache_init();
 int update_arp_cache(struct arp_header * hdr);

@@ -30,7 +30,7 @@ uint8_t* skb_put(struct sk_buff* skb,uint32_t len);
 
 uint8_t * skb_push(struct sk_buff * skb,uint32_t len);
 uint8_t* skb_pull(struct sk_buff *skb,uint32_t len);
-void skb_reverse(struct sk_buff* skb,uint32_t len);
+void skb_reserve(struct sk_buff* skb,uint32_t len);
 
 
 #endif

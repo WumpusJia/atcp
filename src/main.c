@@ -19,9 +19,21 @@ void main_init()
 
 
 
+void test_arp_request()
+{
+    char s[] = "10.0.0.3";
+    uint32_t ip;
+    inet_pton(AF_INET,s,&ip);
+    ip = ntohl(ip);
+    arp_request(netdev_get(),ip);
+}
+
+
 int main()
 {
     main_init();
+
+    test_arp_request();
 
     net_rx_loop();
 

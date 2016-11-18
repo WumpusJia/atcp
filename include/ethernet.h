@@ -21,4 +21,7 @@ struct eth_header
 void eth_print(struct eth_header* hdr);
 struct eth_header* init_eth_header(struct sk_buff * skb);
 
+
+static uint8_t BROADCAST_MAC[] = {0xff,0xff,0xff,0xff,0xff,0xff};
+
 #endif

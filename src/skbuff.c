@@ -58,7 +58,7 @@ static  uint8_t* __skb_pull(struct sk_buff *skb,uint32_t len)
 {
     return __skb_pull(skb,len);
 }
- void skb_reverse(struct sk_buff* skb,uint32_t len)
+ void skb_reserve(struct sk_buff* skb,uint32_t len)
 {
     skb->data += len;
     skb->tail += len;

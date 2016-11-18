@@ -42,13 +42,55 @@ void arp_solve(struct sk_buff* skb)
     {
         case OP_ARP_REQUEST:
             arp_reply(skb,hdr);
+            break;
+        case OP_ARP_REPLY:
+            puts("RECEIVE ARP  REPLY");
+            break;
+        default:
+            puts("Unknown ARP");
+            break;
+
     }
 
 
 
 }
 
-void arp_reply(struct sk_buff* skb,struct arp_header* hdr)
+
+
+int arp_request(struct netdevice* dev,uint32_t reqip)
+{
+
+    struct  sk_buff* skb = alloc_skb(ETH_HEADER_LEN+ARP_HEADER_LEN);
+    skb_reserve(skb,ETH_HEADER_LEN);
+    skb_put(skb,ARP_HEADER_LEN);
+
+    skb->dev = dev;
+
+
+    struct arp_header* hdr = (struct arp_header *)skb->data;
+
+    hdr->htype = htons(HARD_TYPE_ETH);
+    hdr->ptype = htons(PROT_TYPE_IPV4);
+
+
+    hdr->hsize = ETH_MAC_LEN;
+    hdr->psize = 4; //todo: repalce with ipv4 const variable
+
+    hdr->op = htons(OP_ARP_REQUEST);
+
+    hdr->srcip = htonl(dev->ip);
+    memcpy(hdr->srcmac,dev->mac,sizeof(uint8_t)*ETH_MAC_LEN);
+
+    hdr->dstip = htonl(reqip);
+    memcpy(hdr->dstmac,BROADCAST_MAC,sizeof(uint8_t)*ETH_MAC_LEN);
+
+
+    return net_tx_action(skb,BROADCAST_MAC,ETH_P_ARP);
+
+}
+
+int arp_reply(struct sk_buff* skb,struct arp_header* hdr)
 {
     puts("ARP: REPLY");
     struct netdevice * dev = skb->dev;
@@ -81,11 +123,21 @@ void arp_reply(struct sk_buff* skb,struct arp_header* hdr)
     hdr->op = htons(OP_ARP_REPLY);
 
 
-    net_tx_action(skb,hdr->dstmac,ETH_P_ARP);
+    return net_tx_action(skb,hdr->dstmac,ETH_P_ARP);
 
 }
 
 
+/*
+This implement is simple and slow.
+Todo:
+    Use data structure like: hash_table with linked list
+    Support O(1) find and update
+
+    There also need timeout mechanism , function like : double saving space when space is full
+
+
+*/
 static struct arp_cache_node arp_cache[ARP_CACHE_SIZE];
 
 
