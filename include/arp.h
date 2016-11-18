@@ -16,15 +16,15 @@ struct arp_header
 {
     uint16_t htype;
     uint16_t ptype;
-    unsigned char hsize;
-    unsigned char psize;
+    uint8_t hsize;
+    uint8_t psize;
 
     uint16_t op;
 
-    unsigned char srcmac[ETH_LEN];
+    uint8_t srcmac[ETH_LEN];
     uint32_t srcip;
     //unsigned char src_prot_addr[4];
-    unsigned char dstmac[ETH_LEN];
+    uint8_t dstmac[ETH_LEN];
     //unsigned char dst_prot_addr[4];
     uint32_t dstip;
 }__attribute__((packed));
@@ -35,11 +35,13 @@ struct arp_header
 
 struct arp_cache_node
 {
-    unsigned int isused;
+    uint32_t isused;
     uint16_t htype;
     uint32_t ip;
-    unsigned char mac[ETH_LEN];
+    uint8_t mac[ETH_LEN];
 };
+
+void arp_reply();
 
 void arp_solve(struct eth_header* hdr);
 void arp_cache_init();

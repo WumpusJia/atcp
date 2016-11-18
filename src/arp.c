@@ -28,10 +28,22 @@ void arp_solve(struct eth_header* hdr)
         puts("ARP Cache is Full");
     }
 
+    switch(arphdr->op)
+    {
+        case OP_ARP_REQUEST:
+            arp_reply();
+    }
+
 
     //uint32_t num = arphdr->spaddr;
     //printf("SRC %u\n",num);
     //printf("SRC IP: %u,%u,%u,%u\n",(num/256/256/256)%256,(num/256/256)%256,(num/256)%256,num%256);
+
+}
+
+void arp_reply()
+{
+//todo
 
 }
 

@@ -6,7 +6,7 @@ int tun_alloc(char* dev)
     struct ifreq ifr;
     int fd,err;
 
-    if( (fd = open("/dev/net/tun",O_RDWR)) < 0)
+    if( (fd = open("/dev/net/tap",O_RDWR)) < 0)
     {
         printf("ERROR: Could not open TUN/TAP dev\n");
         exit(1);
@@ -36,6 +36,8 @@ int tun_alloc(char* dev)
 }
 
 /*
+sudo mknod /dev/net/tap c 10 200
+sudo chmod 666 /dev/net/tap
 sudo ip tuntap add mode tap dev tap0
 sudo ip link set dev tap0 up  # bring the if up
 sudo ip route add dev tap0 10.0.0.0/24

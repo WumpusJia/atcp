@@ -8,10 +8,10 @@
 
 struct eth_header
 {
-    unsigned char daddr[ETH_LEN];
-    unsigned char saddr[ETH_LEN];
+    uint8_t daddr[ETH_LEN];
+    uint8_t saddr[ETH_LEN];
     uint16_t type;
-    unsigned char payload[];
+    uint8_t payload[];
 
 }__attribute__((packed));;
 

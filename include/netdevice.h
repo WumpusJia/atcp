@@ -5,7 +5,7 @@
 
 struct netdevice
 {
-    unsigned char mac[ETH_LEN];
+    uint8_t mac[ETH_LEN];
     uint32_t ip;
 };
 
