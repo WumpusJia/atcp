@@ -2,6 +2,7 @@
 #include "tuntap.h"
 #include "arp.h"
 #include "ethernet.h"
+#include "ip.h"
 
 
 static struct netdevice _netdev_;
@@ -60,6 +61,12 @@ void net_rx_action(struct sk_buff* skb)
     {
         case ETH_P_ARP:
             arp_solve(skb);
+            break;
+        case ETH_P_IP:
+            ip_solve(skb);
+            break;
+        case ETH_P_IPV6:
+            puts("Unsupport ipv6");
             break;
         default:
             puts("Unknown packet");

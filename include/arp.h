@@ -32,8 +32,10 @@ struct arp_header
     uint32_t dstip;
 }__attribute__((packed));
 
+static struct arp_header * get_arp_header(struct sk_buff * skb);
 
-struct arp_header * init_arp_header(struct sk_buff * skb);
+static void init_arp_header(struct arp_header * hdr);
+static void reset_arp_header(struct arp_header* hdr);
 
 #define ARP_CACHE_SIZE 20
 
@@ -45,9 +47,9 @@ struct arp_cache_node
     uint8_t mac[ETH_MAC_LEN];
 };
 
-int arp_reply(struct sk_buff* skb,struct arp_header* hdr);
+int arp_reply(struct sk_buff* skb);
 int arp_request(struct netdevice* dev,uint32_t reqip);
 void arp_solve(struct sk_buff* skb);
 void arp_cache_init();
-int update_arp_cache(struct arp_header * hdr);
+static int update_arp_cache(struct arp_header * hdr);
 #endif
