@@ -6,6 +6,7 @@ struct sk_buff * alloc_skb(uint32_t datasize)
     struct sk_buff *skb = malloc(sizeof(struct sk_buff));
 
     skb->dev = NULL;
+    skb->dst = NULL;
     skb->protocol = 0;
 
     skb->len = 0;

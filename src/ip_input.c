@@ -1,6 +1,7 @@
 #include "skbuff.h"
 #include "ip.h"
 #include "util.h"
+#include "route.h"
 
 
 
@@ -53,6 +54,19 @@ void ip_solve(struct sk_buff* skb)
         puts("TTL = 0,TimeOut");
         //Todo: send icmp
         return;
+    }
+
+
+    //ip_rcv_finish
+
+    if(skb->dst == NULL)
+    {
+        if(! ip_route_input(skb,hdr->dstip,hdr->srcip)) //route subsystem
+        {
+            puts("Route error : drop");
+            return;
+        }
+
     }
 
     switch(hdr->protocol)

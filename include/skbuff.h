@@ -3,10 +3,13 @@
 
 #include "netdevice.h"
 #include "common.h"
+#include "dst.h"
 
 struct sk_buff
 {
     struct netdevice *dev;
+    struct dst_entry * dst;
+
     uint16_t protocol;
 
     uint32_t len;
