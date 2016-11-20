@@ -4,6 +4,13 @@
 #include "util.h"
 #include "route.h"
 
+/*
+Need datastructure : AVL. To support quick find/edit operator
+
+
+*/
+
+
 struct inet_peer
 {
     uint16_t ip_id_count;

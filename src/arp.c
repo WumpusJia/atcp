@@ -195,3 +195,20 @@ static int update_arp_cache(struct arp_header * hdr)
     }
     return 0;
 }
+
+
+uint8_t * query_arp_cache(uint32_t ip)
+{
+    for(int i = 0;i < ARP_CACHE_SIZE;++i)
+    {
+        struct arp_cache_node* now = &arp_cache[i];
+        if(now->isused)
+        {
+            if(now->ip == ip)
+            {
+                return now->ip;
+            }
+        }
+    }
+    return NULL;
+}
