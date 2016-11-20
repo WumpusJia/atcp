@@ -8,6 +8,9 @@
 #define IP_TCP 0x04
 #define IP_ICMP 0x01
 
+
+#define IP_HEADER_LEN sizeof(struct ip_header)
+
 struct ip_header
 {
     #if defined ATCP_LITTLE_ENDIAN
@@ -29,10 +32,10 @@ struct ip_header
         uint32_t dstip;
 }__attribute__((packed));
 
-static struct ip_header * get_ip_header(struct sk_buff* skb);
+struct ip_header * get_ip_header(struct sk_buff* skb);
 
-static void init_ip_header(struct ip_header* hdr);
-static void reset_ip_header(struct ip_header * hdr);
+void init_ip_header(struct ip_header* hdr);
+void reset_ip_header(struct ip_header * hdr);
 void ip_solve(struct sk_buff* skb);
 
 #endif

@@ -5,28 +5,26 @@
 
 
 
-static struct ip_header * get_ip_header(struct sk_buff* skb)
+struct ip_header * get_ip_header(struct sk_buff* skb)
 {
     return (struct ip_header *)skb->data;
 }
 
-static void init_ip_header(struct ip_header* hdr)
+void init_ip_header(struct ip_header* hdr)
 {
     hdr->totlen = ntohs(hdr->totlen);
     hdr->id = ntohs(hdr->id);
     hdr->frag = ntohs(hdr->frag);
-    hdr->checksum = ntohs(hdr->checksum);
     hdr->srcip = ntohl(hdr->srcip);
     hdr->dstip = ntohl(hdr->dstip);
 
 }
 
-static void reset_ip_header(struct ip_header * hdr)
+void reset_ip_header(struct ip_header * hdr)
 {
     hdr->totlen = htons(hdr->totlen);
     hdr->id = htons(hdr->id);
     hdr->frag = htons(hdr->frag);
-    hdr->checksum = htons(hdr->checksum);
     hdr->srcip = htonl(hdr->srcip);
     hdr->dstip = htonl(hdr->dstip);
 }
