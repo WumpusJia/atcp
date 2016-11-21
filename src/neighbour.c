@@ -16,10 +16,14 @@ int neigh_output(struct sk_buff * skb)
 
     int max_query_cnt = 3;
 
-    while(max_query_cnt && (dstmac = query_arp_cache(dstip)) != NULL)
+     printf("Dst IP: %d,%d,%d,%d\n",(dstip/256/256/256)%256,(dstip/256/256)%256,(dstip/256)%256,dstip%256);
+
+
+    while(max_query_cnt && (dstmac = query_arp_cache(dstip)) == NULL)  //Here need multithread
     {
         arp_request(dev,dstip);
         max_query_cnt--;
+        //sleep(2);
     }
 
     if(dstmac == NULL)

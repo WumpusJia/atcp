@@ -26,6 +26,7 @@ void test_arp_request()
     inet_pton(AF_INET,s,&ip);
     ip = ntohl(ip);
     arp_request(netdev_get(),ip);
+
 }
 
 
@@ -36,7 +37,7 @@ int main()
 
     main_init();
 
-    test_arp_request();
+    //test_arp_request();
 
     net_rx_loop();
 

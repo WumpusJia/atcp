@@ -206,7 +206,7 @@ uint8_t * query_arp_cache(uint32_t ip)
         {
             if(now->ip == ip)
             {
-                return now->ip;
+                return now->mac;
             }
         }
     }

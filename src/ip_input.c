@@ -2,7 +2,7 @@
 #include "ip.h"
 #include "util.h"
 #include "route.h"
-
+#include "icmp.h"
 
 
 struct ip_header * get_ip_header(struct sk_buff* skb)
@@ -36,7 +36,7 @@ void ip_solve(struct sk_buff* skb)
 
     struct ip_header * hdr = get_ip_header(skb);
 
-    if(ip_header_checksum(hdr,hdr->ihl*2) != 0)
+    if(checksum(hdr,hdr->ihl*2) != 0)
     {
         puts("IP Header checksum error!");
         return;
@@ -73,7 +73,8 @@ void ip_solve(struct sk_buff* skb)
             puts("Solve TCP");
             break;
         case IP_ICMP:
-            puts("Solve icmp");
+            skb_pull(skb,IP_HEADER_LEN);
+            icmp_solve(skb);
             break;
         default:
             puts("Unknown IP datagram");

@@ -1,6 +1,6 @@
-#include "ip.h"
 #include "skbuff.h"
 #include "util.h"
+#include "ip.h"
 #include "route.h"
 #include "neighbour.h"
 
@@ -33,7 +33,9 @@ int ip_send(struct sk_buff * skb) //skb->dst has been calculated
     hdr->checksum = 0;
     reset_ip_header(hdr);
 
-    hdr->checksum = ip_header_checksum(hdr,hdr->ihl*2);
+    hdr->checksum = checksum(hdr,hdr->ihl*2);
+    hdr->checksum = htons(hdr->checksum);
+    
 
     return neigh_output(skb);
 

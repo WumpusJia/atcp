@@ -38,4 +38,6 @@ void init_ip_header(struct ip_header* hdr);
 void reset_ip_header(struct ip_header * hdr);
 void ip_solve(struct sk_buff* skb);
 
+int ip_send(struct sk_buff * skb);
+
 #endif
