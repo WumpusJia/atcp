@@ -16,7 +16,7 @@ int neigh_output(struct sk_buff * skb)
 
     int max_query_cnt = 3;
 
-     printf("Dst IP: %d,%d,%d,%d\n",(dstip/256/256/256)%256,(dstip/256/256)%256,(dstip/256)%256,dstip%256);
+    // printf("Dst IP: %d,%d,%d,%d\n",(dstip/256/256/256)%256,(dstip/256/256)%256,(dstip/256)%256,dstip%256);
 
 
     while(max_query_cnt && (dstmac = query_arp_cache(dstip)) == NULL)  //Here need multithread
@@ -33,9 +33,8 @@ int neigh_output(struct sk_buff * skb)
     }
     else
     {
-        return net_tx_action(skb,dstmac,ETH_P_IP);
+         return net_tx_action(skb,dstmac,ETH_P_IP);
     }
-
 
 
 }

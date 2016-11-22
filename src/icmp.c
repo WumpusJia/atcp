@@ -69,7 +69,6 @@ int icmp_echo_reply(struct sk_buff * skb)
     hdr->code = 0;
     hdr->checksum = 0;
 
-    hdr->un.echo.id = getpid();
     hdr->un.echo.seq = _icmp_sent_seq_++;
 
     reset_icmp_header(hdr);

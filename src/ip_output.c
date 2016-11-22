@@ -35,7 +35,7 @@ int ip_send(struct sk_buff * skb) //skb->dst has been calculated
 
     hdr->checksum = checksum(hdr,hdr->ihl*2);
     hdr->checksum = htons(hdr->checksum);
-    
+
 
     return neigh_output(skb);
 
