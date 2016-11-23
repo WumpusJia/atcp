@@ -4,8 +4,11 @@
 #include "common.h"
 #include "skbuff.h"
 
-#define ICMP_ECHO 8
+#define ICMP_ECHO_REQUEST 8
 #define ICMP_ECHO_REPLY 0
+
+
+#define ICMP_ECHO_LEN 64
 
 struct icmp_header
 {
@@ -31,5 +34,5 @@ void init_icmp_header(struct icmp_header* hdr);
 void reset_icmp_header(struct icmp_header * hdr);
 void icmp_solve(struct sk_buff * skb);
 int icmp_echo_reply(struct sk_buff * skb);
-
+int icmp_echo_request(struct netdevice* dev,uint32_t dstip);
 #endif

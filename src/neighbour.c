@@ -16,14 +16,32 @@ int neigh_output(struct sk_buff * skb)
 
     int max_query_cnt = 3;
 
-    // printf("Dst IP: %d,%d,%d,%d\n",(dstip/256/256/256)%256,(dstip/256/256)%256,(dstip/256)%256,dstip%256);
 
 
-    while(max_query_cnt && (dstmac = query_arp_cache(dstip)) == NULL)  //Here need multithread
+
+    // while(max_query_cnt && (dstmac = query_arp_cache(dstip)) == NULL)  //Here need multithread
+    // {
+    //     arp_request(dev,dstip);
+    //     max_query_cnt--;
+    //     //sleep(2);
+    // }
+    //printf("Dst IP: %d,%d,%d,%d\n",(dstip/256/256/256)%256,(dstip/256/256)%256,(dstip/256)%256,dstip%256);
+    dstmac = query_arp_cache(dstip);
+    if(dstmac == NULL)
     {
         arp_request(dev,dstip);
-        max_query_cnt--;
-        //sleep(2);
+
+        while(1)
+        {
+
+            struct sk_buff * skb = alloc_skb(MTU);
+            uint32_t len = tun_read(skb->data,MTU);
+            skb_put(skb,len);
+            net_rx_action(skb);
+
+            if((dstmac = query_arp_cache(dstip)) != NULL)
+                break;
+        }
     }
 
     if(dstmac == NULL)

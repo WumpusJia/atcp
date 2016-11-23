@@ -33,7 +33,6 @@ Test:
 	$ ping -c3 10.0.0.2
 ```
 
-** Due to without using multithread yet, you need to arping first!**
 
 ##License
 Apache Version 2.0

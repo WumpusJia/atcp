@@ -22,7 +22,7 @@ struct rtable
 static struct rtable rt_hash_table[RTABLE_SIZE];
 
 int ip_route_input(struct sk_buff* skb,uint32_t dip,uint32_t sip);  //mock function
-
+int ip_route_output(struct sk_buff* skb,uint32_t dip,uint32_t sip);
 
 
 

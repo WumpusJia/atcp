@@ -11,6 +11,17 @@ int ip_route_input(struct sk_buff* skb,uint32_t dip,uint32_t sip)
     return 1;
 }
 
+int ip_route_output(struct sk_buff* skb,uint32_t dip,uint32_t sip)
+{
+    struct rtable * rtp = &rt_hash_table[0];
+    rtp->rt_dst = dip;
+    rtp->rt_src = sip;
+
+    skb->dst = (struct dst_entry *)rtp;
+
+    return 1;
+}
+
 
 uint16_t ip_select_id(struct dst_entry * dst)
 {
