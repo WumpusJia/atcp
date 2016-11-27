@@ -5,6 +5,9 @@
 #include "common.h"
 #include "dst.h"
 
+#define SKBUFF_ALLOC_DEFAULT 1
+#define SKBUFF_ALLOC_PARTIAL 0
+
 struct sk_buff
 {
     struct netdevice *dev;
@@ -18,9 +21,13 @@ struct sk_buff
     uint8_t *tail;
     uint8_t *end;
 
+    uint8_t alloc_mode;
+
 };
 
 struct sk_buff * alloc_skb(uint32_t datasize);
+struct sk_buff * alloc_p_skb(uint8_t *buf,uint32_t len);
+
 void free_skb(struct sk_buff* skb);
 
 

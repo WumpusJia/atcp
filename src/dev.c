@@ -57,9 +57,8 @@ static void process_pkt(char*buf,struct nm_pkthdr* p)
 {
     uint32_t len = p->len;
 
-    struct sk_buff* skb = alloc_skb(MTU);
+    struct sk_buff* skb = alloc_p_skb(buf,len);
     skb_put(skb,len);
-    memcpy(skb->data,buf,len*sizeof(uint8_t));
 
     //do some init here
     skb->dev = netdev_get();

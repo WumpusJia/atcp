@@ -15,12 +15,34 @@ struct sk_buff * alloc_skb(uint32_t datasize)
     skb->head = skb->data;
     skb->tail = skb->data;
     skb->end = skb->data+ datasize;
+
+    skb->alloc_mode = SKBUFF_ALLOC_DEFAULT;
+}
+
+struct sk_buff * alloc_p_skb(uint8_t *buf,uint32_t len)
+{
+    struct sk_buff *skb = malloc(sizeof(struct sk_buff));
+
+    skb->dev = NULL;
+    skb->dst = NULL;
+    skb->protocol = 0;
+
+    skb->len = 0;
+
+    skb->data = buf;
+    skb->head = skb->data;
+    skb->tail = skb->data;
+    skb->end = skb->data+ len;
+
+    skb->alloc_mode = SKBUFF_ALLOC_PARTIAL;
 }
 
 
 void free_skb(struct sk_buff* skb)
 {
-    free(skb->head);
+    if(skb->alloc_mode == SKBUFF_ALLOC_DEFAULT)
+        free(skb->head);
+
     free(skb);
 }
 
