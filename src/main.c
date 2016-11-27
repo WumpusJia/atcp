@@ -1,9 +1,10 @@
+
 #include "common.h"
 #include "util.h"
 #include "ethernet.h"
 #include "arp.h"
-#include "tuntap.h"
 #include "netdevice.h"
+#include "dev.h"
 
 
 
@@ -11,9 +12,10 @@
 void main_init()
 {
 
-    tun_init();
+    netdev_init("eth0");
 
-    netdev_init("10.0.0.2","52:27:1e:b1:f6:60");
+    net_init("eth0");
+
     arp_cache_init();
 }
 
