@@ -7,6 +7,8 @@
 struct dst_entry
 {
     struct netdevice *dev;
+
+    struct neighbour * neighbour;
 };
 
 

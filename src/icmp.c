@@ -34,11 +34,12 @@ void reset_icmp_header(struct icmp_header * hdr)
     }
 }
 
-
 void icmp_solve(struct sk_buff * skb)
 {
     puts("SOLVE icmp");
     struct icmp_header * hdr = get_icmp_header(skb);
+
+
 
     if(checksum(hdr,skb->len/2))
     {
@@ -66,6 +67,10 @@ void icmp_solve(struct sk_buff * skb)
 
 int icmp_echo_reply(struct sk_buff * skb)
 {
+
+
+
+
     puts("Send ICMP reply");
     struct icmp_header * hdr = get_icmp_header(skb);
 
@@ -78,6 +83,8 @@ int icmp_echo_reply(struct sk_buff * skb)
     hdr->checksum = htons(hdr->checksum);
 
     skb->protocol = IP_ICMP;
+
+
 
     return ip_send(skb);
 

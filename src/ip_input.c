@@ -59,6 +59,7 @@ void ip_solve(struct sk_buff* skb)
 
     if(skb->dst == NULL)
     {
+
         if(! ip_route_input(skb,hdr->dstip,hdr->srcip)) //route subsystem
         {
             puts("Route error : drop");
@@ -66,6 +67,8 @@ void ip_solve(struct sk_buff* skb)
         }
 
     }
+
+    
 
     switch(hdr->protocol)
     {

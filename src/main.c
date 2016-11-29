@@ -16,14 +16,14 @@ void main_init()
 
     net_init("eth0");
 
-    arp_cache_init();
+    arp_init();
 }
 
 
 
 void test_arp_request()
 {
-    char s[] = "10.0.0.3";
+    char s[] = "192.168.1.80";
     uint32_t ip;
     inet_pton(AF_INET,s,&ip);
     ip = ntohl(ip);
@@ -31,16 +31,15 @@ void test_arp_request()
 
 }
 
-
-void test_icmp_request()
-{
-    char s[] = "10.0.0.3";
-    uint32_t ip;
-    inet_pton(AF_INET,s,&ip);
-    ip = ntohl(ip);
-    icmp_echo_request(netdev_get(),ip);
-}
-
+//
+// void test_icmp_request()
+// {
+//     char s[] = "10.0.0.3";
+//     uint32_t ip;
+//     inet_pton(AF_INET,s,&ip);
+//     ip = ntohl(ip);
+//     icmp_echo_request(netdev_get(),ip);
+// }
 
 
 
@@ -50,7 +49,7 @@ int main()
     main_init();
 
     //test_icmp_request();
-    //test_arp_request();
+    test_arp_request();
 
     net_rx_loop();
 

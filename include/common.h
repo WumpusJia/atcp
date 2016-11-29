@@ -3,7 +3,7 @@
 
 #include<sys/socket.h>
 #include<linux/if.h>
-#include<linux/if_tun.h>
+#include<linux/if_ether.h>
 #include<sys/ioctl.h>
 #include<fcntl.h>
 #include<stdio.h>
@@ -15,5 +15,6 @@
 #include<arpa/inet.h>
 #include<assert.h>
 #include<unistd.h>
+#include<pthread.h>
 
 #endif

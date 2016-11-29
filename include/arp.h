@@ -47,11 +47,11 @@ struct arp_cache_node
     uint8_t mac[ETH_MAC_LEN];
 };
 
+int arp_bind_neighbour(struct dst_entry * dst);
+
 int arp_reply(struct sk_buff* skb);
 int arp_request(struct netdevice* dev,uint32_t reqip);
-void arp_solve(struct sk_buff* skb);
-void arp_cache_init();
-static int update_arp_cache(struct arp_header * hdr);
+void arp_rcv(struct sk_buff* skb);
 
-uint8_t * query_arp_cache(uint32_t ip);
+
 #endif

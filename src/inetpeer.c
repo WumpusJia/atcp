@@ -1,6 +1,6 @@
 #include "inetpeer.h"
 
-
+static struct inet_peer inet_peer_cache;
 void rt_bind_peer(struct rtable* rt)
 {
     rt -> peer = &inet_peer_cache;

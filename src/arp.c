@@ -1,9 +1,110 @@
 #include "arp.h"
 #include "common.h"
+#include "neighbour.h"
+#include "route.h"
 
-//http://backreference.org/2010/03/26/tuntap-interface-tutorial/  this article introduce TUN/TAP
 
 
+
+
+#define ARP_HASH_BASE 57
+#define ARP_HASH_MOD 233
+#define ARP_HASH_MAX_SIZE 100
+
+uint32_t arp_hash(void *key)
+{
+    uint32_t res = 0;
+    uint8_t *p = key;
+    for(int i = 0;i < 4;++i)
+    {
+        res = (res*ARP_HASH_BASE+(*p))%ARP_HASH_MOD;
+    }
+    return res;
+}
+
+
+int arp_resolve_output(struct sk_buff * skb)
+{
+    skb->protocol = ETH_P_IP;
+    return neigh_event_send(skb->dst->neighbour,skb);
+
+}
+
+static struct neigh_ops arp_generic_ops = {
+    output: arp_resolve_output,
+};
+
+int arp_constructor(struct neighbour* n)
+{
+    n->ops = &arp_generic_ops;
+}
+
+
+
+
+static struct neigh_table arp_tbl = {
+    key_len : 4,
+    hash: arp_hash,
+    constructor : arp_constructor,
+    hash_size : ARP_HASH_MOD,
+    hash_max_size : ARP_HASH_MAX_SIZE,
+
+};
+
+
+
+void mock_arp_cache() //due to without neigh_event   , mock cache here
+{
+    uint32_t dstip = 192*256*256*256+168*256*256+1*256+80;
+
+
+
+
+    struct neighbour *n = neigh_lookup(&arp_tbl,&dstip);
+    n->mac[0] = 0xd0;
+    n->mac[1] = 0xe7;
+    n->mac[2] = 0x82;
+    n->mac[3] = 0xeb;
+    n->mac[4] = 0x3f;
+    n->mac[5] = 0x57;
+}
+
+
+
+void arp_init()
+{
+    neigh_table_init(&arp_tbl);
+//    mock_arp_cache();
+}
+
+
+
+
+int arp_bind_neighbour(struct dst_entry * dst)
+{
+    struct neighbour* n = dst->neighbour;
+    if(n == NULL)
+    {
+
+        uint32_t dstip = ((struct rtable*)dst)->rt_dst;
+
+        n = neigh_lookup(&arp_tbl,&dstip);
+        if(n == NULL) return 0;
+        dst->neighbour = n;
+    }
+    return 1;
+
+}
+
+
+
+
+
+
+
+
+
+/////////////////////////////////////
 static struct arp_header * get_arp_header(struct sk_buff * skb)
 {
     return (struct arp_header *)skb->data;
@@ -33,12 +134,14 @@ static void reset_arp_header(struct arp_header* hdr)
 }
 
 
-void arp_solve(struct sk_buff* skb)
+void arp_rcv(struct sk_buff* skb)
 {
     puts("SOLVE : ARP");
 
     struct arp_header * hdr = get_arp_header(skb);
     init_arp_header(hdr);
+
+
 
 
     //Suppose hard_type = 1 (ethernet)
@@ -48,10 +151,7 @@ void arp_solve(struct sk_buff* skb)
     assert(hdr->ptype == PROT_TYPE_IPV4);
 
 
-    if(!update_arp_cache(hdr))
-    {
-        puts("ARP Cache is Full");
-    }
+    neigh_event_rcv(&arp_tbl,hdr->srcmac,&hdr->srcip);
 
     switch(hdr->op)
     {
@@ -71,7 +171,7 @@ void arp_solve(struct sk_buff* skb)
 
 }
 
-
+static uint8_t BROADCAST_MAC[] = {0xff,0xff,0xff,0xff,0xff,0xff};
 
 int arp_request(struct netdevice* dev,uint32_t reqip)
 {
@@ -148,67 +248,9 @@ int arp_reply(struct sk_buff* skb)
 
 
 /*
-This implement is simple and slow.
-Todo:
-    Use data structure like: hash_table with linked list
-    Support O(1) find and update
 
-    There also need timeout mechanism , function like : double saving space when space is full
 
+
+neigh_resolve_output() ->  neigh_event_sent()
 
 */
-static struct arp_cache_node arp_cache[ARP_CACHE_SIZE];
-
-
-void arp_cache_init()
-{
-    memset(arp_cache,0,sizeof(arp_cache));
-}
-
-
-static int update_arp_cache(struct arp_header * hdr)
-{
-    for(int i = 0;i < ARP_CACHE_SIZE;++i)
-    {
-        struct arp_cache_node* now = &arp_cache[i];
-        if(now->isused)
-        {
-            if(now->htype == hdr->htype && now->ip == hdr->srcip)
-            {
-                memcpy(now->mac,hdr->srcmac,ETH_MAC_LEN);
-                return 1;
-            }
-        }
-    }
-
-    for(int i = 0;i < ARP_CACHE_SIZE;++i)
-    {
-        struct arp_cache_node* now = &arp_cache[i];
-        if(!now->isused)
-        {
-            now->isused = 1;
-            now->htype = hdr->htype;
-            now->ip = hdr->srcip;
-            memcpy(now->mac,hdr->srcmac,sizeof(hdr->srcmac));
-            return 1;
-        }
-    }
-    return 0;
-}
-
-
-uint8_t * query_arp_cache(uint32_t ip)
-{
-    for(int i = 0;i < ARP_CACHE_SIZE;++i)
-    {
-        struct arp_cache_node* now = &arp_cache[i];
-        if(now->isused)
-        {
-            if(now->ip == ip)
-            {
-                return now->mac;
-            }
-        }
-    }
-    return NULL;
-}

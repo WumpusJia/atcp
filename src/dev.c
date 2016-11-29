@@ -37,7 +37,7 @@ void netif_receive_skb(struct sk_buff* skb)
     switch (hdr->type)
     {
         case ETH_P_ARP:
-            arp_solve(skb);
+            arp_rcv(skb);
             break;
         case ETH_P_IP:
             ip_solve(skb);
@@ -91,8 +91,7 @@ void net_rx_loop()
 
 int net_tx_action(struct sk_buff* skb,uint8_t * dst_mac,uint16_t type)
 {
-
-
+    
     skb_push(skb,ETH_HEADER_LEN);
     struct eth_header* ethhdr = (struct eth_header*) skb->data;
 

@@ -4,7 +4,7 @@ SRCDIR = ./src
 BUILDDIR = ./build
 
 CC = gcc
-CFLAGS = -I$(IDIR)
+CFLAGS = -I$(IDIR) -lpthread
 
 _OBJ = $(patsubst $(SRCDIR)/%.c,%.o,$(wildcard $(SRCDIR)/*.c) )#main.o util.o ethernet.o arp.o
 
