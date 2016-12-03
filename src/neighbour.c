@@ -147,11 +147,33 @@ struct sk_buff * neigh_queue_pop_back(struct neighbour* neigh)
 ///////////////////////////////////////////
 
 
+void neigh_queue_send_all(struct neighbour * neigh)
+{
+    struct sk_buff * now = NULL;
+    while( (now = neigh_queue_pop_front(neigh)) != NULL)
+    {
+        net_tx_action(now,neigh->mac,now->protocol);
+    }
+}
+
+
 int neigh_event_rcv(struct neigh_table * tbl,uint8_t * mac,void* ip)
 {
+
     struct neighbour * n = neigh_lookup(tbl,ip);
     if(n)
-        neigh_update(n,mac,NUD_REACHABLE);
+    {
+
+        pthread_rwlock_rdlock(&n->lock);
+        if(n->nud_state == NUD_NONE)
+        {
+            pthread_rwlock_unlock(&n->lock);
+
+            neigh_update(n,mac,NUD_REACHABLE);
+            neigh_queue_send_all(n);
+        }
+
+    }
     return n;
 
 }
@@ -160,12 +182,27 @@ int neigh_event_rcv(struct neigh_table * tbl,uint8_t * mac,void* ip)
 int neigh_event_send(struct neighbour * neigh,struct sk_buff * skb)
 {
 
-
     pthread_rwlock_rdlock(&neigh->lock);
-    uint8_t buf[ETH_MAC_LEN];
-    memcpy(buf,neigh->mac,ETH_MAC_LEN);
+    uint8_t status = neigh->nud_state;
     pthread_rwlock_unlock(&neigh->lock);
 
+    if(status == NUD_REACHABLE)
+    {
+        pthread_rwlock_rdlock(&neigh->lock);
+        uint8_t buf[ETH_MAC_LEN];
+        memcpy(buf,neigh->mac,ETH_MAC_LEN);
+        pthread_rwlock_unlock(&neigh->lock);
+        return net_tx_action(skb,buf,skb->protocol);
+    }
+    else if(status == NUD_NONE)
+    {
+        neigh_queue_push_back(neigh,skb);
+        pthread_rwlock_rdlock(&neigh->lock);
+        uint8_t buf[IP_MAX_LEN];
+        memcpy(buf,neigh->ip,IP_MAX_LEN);
+        pthread_rwlock_unlock(&neigh->lock);
 
-    return net_tx_action(skb,buf,skb->protocol);
+        return neigh->ops->request(buf);
+    }
+
 }

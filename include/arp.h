@@ -50,7 +50,7 @@ struct arp_cache_node
 int arp_bind_neighbour(struct dst_entry * dst);
 
 int arp_reply(struct sk_buff* skb);
-int arp_request(struct netdevice* dev,uint32_t reqip);
+int arp_request(void *ip);
 void arp_rcv(struct sk_buff* skb);
 
 

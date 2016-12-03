@@ -32,6 +32,7 @@ int arp_resolve_output(struct sk_buff * skb)
 
 static struct neigh_ops arp_generic_ops = {
     output: arp_resolve_output,
+    request : arp_request,
 };
 
 int arp_constructor(struct neighbour* n)
@@ -53,28 +54,10 @@ static struct neigh_table arp_tbl = {
 
 
 
-void mock_arp_cache() //due to without neigh_event   , mock cache here
-{
-    uint32_t dstip = 192*256*256*256+168*256*256+1*256+80;
-
-
-
-
-    struct neighbour *n = neigh_lookup(&arp_tbl,&dstip);
-    n->mac[0] = 0xd0;
-    n->mac[1] = 0xe7;
-    n->mac[2] = 0x82;
-    n->mac[3] = 0xeb;
-    n->mac[4] = 0x3f;
-    n->mac[5] = 0x57;
-}
-
-
 
 void arp_init()
 {
     neigh_table_init(&arp_tbl);
-//    mock_arp_cache();
 }
 
 
@@ -173,14 +156,15 @@ void arp_rcv(struct sk_buff* skb)
 
 static uint8_t BROADCAST_MAC[] = {0xff,0xff,0xff,0xff,0xff,0xff};
 
-int arp_request(struct netdevice* dev,uint32_t reqip)
+int arp_request(void *ip)
 {
+    uint32_t reqip = * ((uint32_t *)ip);
 
     struct  sk_buff* skb = alloc_skb(ETH_HEADER_LEN+ARP_HEADER_LEN);
     skb_reserve(skb,ETH_HEADER_LEN);
     skb_put(skb,ARP_HEADER_LEN);
 
-    skb->dev = dev;
+    skb->dev = netdev_get();
 
 
     struct arp_header* hdr = (struct arp_header *)skb->data;
@@ -194,8 +178,8 @@ int arp_request(struct netdevice* dev,uint32_t reqip)
 
     hdr->op = OP_ARP_REQUEST;
 
-    hdr->srcip = dev->ip;
-    memcpy(hdr->srcmac,dev->mac,sizeof(uint8_t)*ETH_MAC_LEN);
+    hdr->srcip = skb->dev->ip;
+    memcpy(hdr->srcmac,skb->dev->mac,sizeof(uint8_t)*ETH_MAC_LEN);
 
     hdr->dstip = reqip;
     memcpy(hdr->dstmac,BROADCAST_MAC,sizeof(uint8_t)*ETH_MAC_LEN);
@@ -216,7 +200,7 @@ int arp_reply(struct sk_buff* skb)
     if(dev->ip != hdr->dstip)
     {
         puts("Not come for me~");
-        return;
+        return 0;
     }
 
 

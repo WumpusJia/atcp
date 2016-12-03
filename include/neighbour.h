@@ -43,6 +43,7 @@ struct neighbour
 struct neigh_ops
 {
     int (*output) (struct sk_buff*);
+    int (*request) (void *ip);
 };
 
 struct neigh_table
