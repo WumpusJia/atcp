@@ -18,6 +18,8 @@ static struct neightbour * neigh_alloc(struct neigh_table * tbl,const void* key)
     n->prev = NULL;
     n->ops = NULL;
 
+    skb_queue_init(&n->queue);
+
     tbl->constructor(n);
 
     memcpy(n->ip,key,tbl->key_len);
@@ -111,6 +113,39 @@ int neigh_update(struct neighbour* neigh,uint8_t * mac,uint8_t new)
 
     return 1;
 }
+
+/////////////////////////////////////////////
+void neigh_queue_push_front(struct neighbour* neigh,struct sk_buff * skb)
+{
+    pthread_rwlock_wrlock(&neigh->lock);
+    skb_queue_push_front(&neigh->queue,skb);
+    pthread_rwlock_unlock(&neigh->lock);
+}
+void neigh_queue_push_back(struct neighbour* neigh,struct sk_buff * skb)
+{
+    pthread_rwlock_wrlock(&neigh->lock);
+    skb_queue_push_back(&neigh->queue,skb);
+    pthread_rwlock_unlock(&neigh->lock);
+}
+struct sk_buff * neigh_queue_pop_front(struct neighbour* neigh)
+{
+    struct sk_buff * res = NULL;
+    pthread_rwlock_wrlock(&neigh->lock);
+    res = skb_queue_pop_front(&neigh->queue);
+    pthread_rwlock_unlock(&neigh->lock);
+    return res;
+}
+struct sk_buff * neigh_queue_pop_back(struct neighbour* neigh)
+{
+    struct sk_buff * res = NULL;
+    pthread_rwlock_wrlock(&neigh->lock);
+    res = skb_queue_pop_back(&neigh->queue);
+    pthread_rwlock_unlock(&neigh->lock);
+    return res;
+}
+
+///////////////////////////////////////////
+
 
 int neigh_event_rcv(struct neigh_table * tbl,uint8_t * mac,void* ip)
 {

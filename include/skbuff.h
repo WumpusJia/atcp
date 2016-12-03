@@ -8,10 +8,26 @@
 #define SKBUFF_ALLOC_DEFAULT 1
 #define SKBUFF_ALLOC_PARTIAL 0
 
+
+struct sk_buff_head
+{
+    struct sk_buff * next;
+    struct sk_buff * prev;
+    uint32_t len;
+};
+
+
 struct sk_buff
 {
+    struct sk_buff * next;
+    struct sk_buff * prev;
+
+
     struct netdevice *dev;
     struct dst_entry * dst;
+
+    struct sk_buff_head * list;
+
 
     uint16_t protocol;
 
@@ -42,5 +58,12 @@ uint8_t * skb_push(struct sk_buff * skb,uint32_t len);
 uint8_t* skb_pull(struct sk_buff *skb,uint32_t len);
 void skb_reserve(struct sk_buff* skb,uint32_t len);
 
+///////////////////////////////////
+
+void skb_queue_init(struct sk_buff_head * list);
+void skb_queue_push_front(struct sk_buff_head * list,struct sk_buff * skb);
+void skb_queue_push_back(struct sk_buff_head * list,struct sk_buff * skb);
+struct sk_buff * skb_queue_pop_front(struct sk_buff_head *list);
+struct sk_buff * skb_queue_pop_back(struct sk_buff_head *list);
 
 #endif

@@ -34,7 +34,7 @@ struct neighbour
     struct neighbour * next;
     struct neighbour * prev;
 
-    //sk_buff queue
+    struct sk_buff_head queue;
     struct neigh_ops *ops;
     pthread_rwlock_t lock;
 };
@@ -63,9 +63,14 @@ struct neigh_table
 void neigh_table_init(struct neigh_table * tbl);
 
 int neigh_output(struct sk_buff * skb);
-
-
 struct neighbour* neigh_lookup(struct neigh_table * tbl,const void* key);
+
+void neigh_queue_push_front(struct neighbour* neigh,struct sk_buff * skb);
+void neigh_queue_push_back(struct neighbour* neigh,struct sk_buff * skb);
+struct sk_buff * neigh_queue_pop_front(struct neighbour* neigh);
+struct sk_buff * neigh_queue_pop_back(struct neighbour* neigh);
+
+
 int neigh_event_rcv(struct neigh_table * tbl,uint8_t * mac,void* ip);
 int neigh_event_send(struct neighbour * neigh,struct sk_buff * skb);
 #endif

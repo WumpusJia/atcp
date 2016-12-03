@@ -25,6 +25,9 @@ struct sk_buff * alloc_p_skb(uint8_t *buf,uint32_t len)
 
     skb->dev = NULL;
     skb->dst = NULL;
+    skb->list = NULL;
+    skb->prev = NULL;
+    skb->next = NULL;
     skb->protocol = 0;
 
     skb->len = 0;
@@ -85,4 +88,86 @@ static  uint8_t* __skb_pull(struct sk_buff *skb,uint32_t len)
 {
     skb->data += len;
     skb->tail += len;
+}
+
+///////////////////////////////////
+void skb_queue_init(struct sk_buff_head * list)
+{
+    list->prev = (struct sk_buff *)list;
+    list->next = (struct sk_buff *)list;
+    list->len = 0;
+}
+
+
+
+void skb_queue_push_front(struct sk_buff_head * list,struct sk_buff * skb)
+{
+    skb->list = list;
+
+    struct sk_buff * tprev = (struct sk_buff *)list;
+    struct sk_buff* tnext = list->next;
+
+    skb->prev = tprev;
+    skb->next = tnext;
+
+    tprev->next = skb;
+    tnext->prev = skb;
+
+    list->len++;
+
+}
+
+void skb_queue_push_back(struct sk_buff_head * list,struct sk_buff * skb)
+{
+    skb->list = list;
+
+    struct sk_buff * tnext = (struct sk_buff *)list;
+    struct sk_buff* tprev = list->prev;
+
+    skb->prev = tprev;
+    skb->next = tnext;
+
+    tprev->next = skb;
+    tnext->prev = skb;
+
+    list->len++;
+
+}
+
+
+struct sk_buff * skb_queue_pop_front(struct sk_buff_head *list)
+{
+    struct sk_buff * tprev = (struct sk_buff*) list;
+    struct sk_buff * res = list->next;
+    if(tprev == res) return NULL;
+
+    struct sk_buff * tnext = res->next;
+    tprev->next = tnext;
+    tnext->prev = tprev;
+    list->len--;
+
+    res->next = NULL;
+    res->prev = NULL;
+    res->list = NULL;
+
+    return res;
+}
+
+
+struct sk_buff * skb_queue_pop_back(struct sk_buff_head *list)
+{
+    struct sk_buff * tnext = (struct sk_buff*) list;
+    struct sk_buff * res = list->prev;
+    if(tnext == res) return NULL;
+
+    struct sk_buff * tprev = res->prev;
+    tprev->next = tnext;
+    tnext->prev = tprev;
+    list->len--;
+
+    res->next = NULL;
+    res->prev = NULL;
+    res->list = NULL;
+
+    return res;
 }
