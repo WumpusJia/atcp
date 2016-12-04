@@ -11,7 +11,7 @@ static struct neightbour * neigh_alloc(struct neigh_table * tbl,const void* key)
     n->tbl = tbl;
 
     n->nud_state = NUD_NONE;
-
+    n->req_cnt = 0;
     memset(n->ip,0,sizeof(n->ip));
     memset(n->mac,0,sizeof(n->mac));
     n->next = NULL;
@@ -104,8 +104,11 @@ int neigh_update(struct neighbour* neigh,uint8_t * mac,uint8_t new)
 {
 
     pthread_rwlock_wrlock(&neigh->lock);
+    if(neigh->nud_state == NUD_NONE && new == NUD_REACHABLE)
+        neigh->req_cnt = 0;
     neigh->nud_state = new;
-    memcpy(neigh->mac,mac,ETH_MAC_LEN);
+    if(mac)
+        memcpy(neigh->mac,mac,ETH_MAC_LEN);
 
     pthread_rwlock_unlock(&neigh->lock);
 
@@ -168,7 +171,6 @@ int neigh_event_rcv(struct neigh_table * tbl,uint8_t * mac,void* ip)
         if(n->nud_state == NUD_NONE)
         {
             pthread_rwlock_unlock(&n->lock);
-
             neigh_update(n,mac,NUD_REACHABLE);
             neigh_queue_send_all(n);
         }
@@ -200,7 +202,14 @@ int neigh_event_send(struct neighbour * neigh,struct sk_buff * skb)
         pthread_rwlock_rdlock(&neigh->lock);
         uint8_t buf[IP_MAX_LEN];
         memcpy(buf,neigh->ip,IP_MAX_LEN);
+        uint8_t try_cnt = neigh->req_cnt;
         pthread_rwlock_unlock(&neigh->lock);
+
+        if(try_cnt >= MAX_REQUEST_TIMES)
+        {
+            neigh_update(neigh,NULL,NUD_FAILED);
+            return 0;
+        }
 
         return neigh->ops->request(buf);
     }

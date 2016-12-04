@@ -29,6 +29,7 @@ struct sk_buff
     struct sk_buff_head * list;
 
 
+
     uint16_t protocol;
 
     uint32_t len;
@@ -38,7 +39,7 @@ struct sk_buff
     uint8_t *end;
 
     uint8_t alloc_mode;
-
+    struct timeval stamp;
 };
 
 struct sk_buff * alloc_skb(uint32_t datasize);

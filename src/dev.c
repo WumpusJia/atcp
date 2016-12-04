@@ -62,6 +62,7 @@ static void process_pkt(char*buf,struct nm_pkthdr* p)
 
     //do some init here
     skb->dev = netdev_get();
+    gettimeofday(&skb->stamp,NULL);
 
     netif_receive_skb(skb);
 
@@ -91,7 +92,7 @@ void net_rx_loop()
 
 int net_tx_action(struct sk_buff* skb,uint8_t * dst_mac,uint16_t type)
 {
-    
+
     skb_push(skb,ETH_HEADER_LEN);
     struct eth_header* ethhdr = (struct eth_header*) skb->data;
 

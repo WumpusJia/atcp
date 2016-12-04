@@ -18,6 +18,8 @@
 #define NUD_NONE        0x00
 
 
+#define MAX_REQUEST_TIMES 5
+
 #define IP_MAX_LEN 16
 
 struct neighbour
@@ -25,6 +27,7 @@ struct neighbour
 
     struct neigh_table *tbl;
     uint8_t nud_state;
+    uint8_t req_cnt;
 
     uint8_t ip[IP_MAX_LEN];
     uint8_t mac[ETH_MAC_LEN];
