@@ -117,7 +117,17 @@ int neigh_update(struct neighbour* neigh,uint8_t * mac,uint8_t new)
     return 1;
 }
 
+void neigh_free(struct neigh_table * tbl,struct neighbour * n)
+{
+    //todo
+
+}
+
+
 /////////////////////////////////////////////
+
+
+
 void neigh_queue_push_front(struct neighbour* neigh,struct sk_buff * skb)
 {
     pthread_rwlock_wrlock(&neigh->lock);
@@ -148,7 +158,14 @@ struct sk_buff * neigh_queue_pop_back(struct neighbour* neigh)
 }
 
 ///////////////////////////////////////////
-
+void neigh_queue_free(struct neighbour * neigh)
+{
+    struct sk_buff * now = NULL;
+    while( (now = neigh_queue_pop_front(neigh)) != NULL)
+    {
+        free_skb(now);
+    }
+}
 
 void neigh_queue_send_all(struct neighbour * neigh)
 {
@@ -212,6 +229,10 @@ int neigh_event_send(struct neighbour * neigh,struct sk_buff * skb)
         }
 
         return neigh->ops->request(buf);
+    }
+    else if(status == NUD_FAILED)
+    {
+        return 0; //should free skb on higher layer
     }
 
 }

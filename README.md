@@ -1,7 +1,7 @@
 # atcp
 Linux userspace TCP/IP stack.
 
-Base on NetMap
+L2 IO is Based on NetMap
 ##Usage:
 * Install netmap, See [here](https://github.com/luigirizzo/netmap)
 * Download atcp
@@ -15,9 +15,12 @@ Base on NetMap
 
 ##Support
 
-* Basic arp send/request
-* ICMPv4 echo reply
+* Neighbour subsystem
+* ICMPv4 echo reply/request
 
+##Todo
+* Add Route subsystem
+* Handle IP options 
 
 ##License
 Apache Version 2.0

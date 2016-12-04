@@ -74,6 +74,7 @@ void neigh_queue_push_back(struct neighbour* neigh,struct sk_buff * skb);
 struct sk_buff * neigh_queue_pop_front(struct neighbour* neigh);
 struct sk_buff * neigh_queue_pop_back(struct neighbour* neigh);
 
+void neigh_queue_free(struct neighbour * neigh);
 
 int neigh_event_rcv(struct neigh_table * tbl,uint8_t * mac,void* ip);
 int neigh_event_send(struct neighbour * neigh,struct sk_buff * skb);
