@@ -5,7 +5,7 @@
 #include "arp.h"
 #include "netdevice.h"
 #include "dev.h"
-
+#include "route.h"
 
 
 
@@ -16,6 +16,7 @@ void main_init()
 
     net_init("eth0");
 
+    ip_rt_init();
     arp_init();
 }
 

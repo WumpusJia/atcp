@@ -29,6 +29,7 @@ void netdev_init(char * s)
 
     dev->ip = ntohl( ((struct sockaddr_in*)&(buf.ifr_addr))->sin_addr.s_addr);
 
+    dev->ifindex = 1;
 
     close(fd);
 

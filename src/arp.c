@@ -18,6 +18,7 @@ uint32_t arp_hash(void *key)
     for(int i = 0;i < 4;++i)
     {
         res = (res*ARP_HASH_BASE+(*p))%ARP_HASH_MOD;
+        p++;
     }
     return res;
 }

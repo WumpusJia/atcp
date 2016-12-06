@@ -215,6 +215,7 @@ int neigh_event_send(struct neighbour * neigh,struct sk_buff * skb)
     }
     else if(status == NUD_NONE)
     {
+
         neigh_queue_push_back(neigh,skb);
         pthread_rwlock_rdlock(&neigh->lock);
         uint8_t buf[IP_MAX_LEN];
@@ -227,6 +228,7 @@ int neigh_event_send(struct neighbour * neigh,struct sk_buff * skb)
             neigh_update(neigh,NULL,NUD_FAILED);
             return 0;
         }
+
 
         return neigh->ops->request(buf);
     }

@@ -68,8 +68,15 @@ void ip_solve(struct sk_buff* skb)
 
     }
 
-    
 
+
+    skb->dst->input(skb);
+
+}
+
+int ip_local_deliver(struct sk_buff * skb)
+{
+    struct ip_header * hdr = get_ip_header(skb);
     switch(hdr->protocol)
     {
         case IP_TCP:
@@ -84,5 +91,24 @@ void ip_solve(struct sk_buff* skb)
             break;
 
     }
+}
+
+
+int ip_io_error(struct sk_buff * skb)
+{
+    puts("ERROR: dst io error");
+}
+
+
+
+
+int ip_forward(struct sk_buff * skb)
+{
+
+}
+
+
+int ip_output(struct sk_buff * skb)
+{
 
 }

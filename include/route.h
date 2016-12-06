@@ -6,6 +6,10 @@
 #include "dst.h"
 #include "skbuff.h"
 #include "inetpeer.h"
+#include "flow.h"
+
+
+
 
 struct rtable
 {
@@ -15,11 +19,18 @@ struct rtable
 
     uint32_t rt_dst;
     uint32_t rt_src;
+
+    uint8_t rt_type;
+
+    uint32_t rt_gateway;
+
+    struct flowi fl;
+    struct rtable* next;
 };
 
 
-#define RTABLE_SIZE 20
-static struct rtable rt_hash_table[RTABLE_SIZE];
+int ip_rt_init();
+
 
 int ip_route_input(struct sk_buff* skb,uint32_t dip,uint32_t sip);  //mock function
 int ip_route_output(struct sk_buff* skb,uint32_t dip,uint32_t sip);

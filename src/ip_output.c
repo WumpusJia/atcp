@@ -11,7 +11,7 @@ int ip_send(struct sk_buff * skb) //skb->dst has been calculated
 
 // ip_route_output() ----
 
-    arp_bind_neighbour(skb->dst); //temporary here.  should be put into route subsystem
+
 
 
 
@@ -19,6 +19,16 @@ int ip_send(struct sk_buff * skb) //skb->dst has been calculated
 
     struct rtable* rt = (struct rtable *)skb->dst;
 
+    // temporary
+    static int flag = 0;
+    if(!flag)
+    {
+        uint32_t tt = rt->rt_src;
+        rt->rt_src = rt->rt_dst;
+        rt->rt_dst = tt;
+        arp_bind_neighbour(skb->dst); //temporary here.  should be put into route subsystem
+        flag = 1;
+    }
 
     skb_push(skb,IP_HEADER_LEN);
 
@@ -47,7 +57,7 @@ int ip_send(struct sk_buff * skb) //skb->dst has been calculated
 
     struct neighbour * n = skb->dst->neighbour; //temporary here.
 
-    
+
 
     return n->ops->output(skb);
 
