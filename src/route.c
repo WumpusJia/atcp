@@ -3,6 +3,7 @@
 #include "flow.h"
 #include "neighbour.h"
 #include "ip.h"
+#include "netdevice.h"
 
 #define RTABLE_HASH_MOD 233
 #define RTABLE_HASH_BASE 57
@@ -63,7 +64,9 @@ struct rtable* ip_rt_insert(uint32_t hash,struct rtable* now)
 
     if(now->rt_type == RTN_UNICAST || now->fl.iif == 0)
     {
-        arp_bind_neighbour(now->dst);
+
+        arp_bind_neighbour((struct dst_entry *)now);
+
     }
 
     now->next = rt_hash_table[hash].queue;
@@ -119,7 +122,7 @@ int ip_route_input_slow(struct sk_buff* skb,uint32_t dip,uint32_t sip)
 
     if(res.type == RTN_LOCAL)
     {
-        
+
         rth = rt_alloc();
 
         rth->dst.input = ip_local_deliver;
@@ -138,10 +141,14 @@ int ip_route_input_slow(struct sk_buff* skb,uint32_t dip,uint32_t sip)
         rth->rt_type = res.type;
 
         skb->dst = (struct dst_entry * )ip_rt_insert(hash,rth);
+
         return 1;
     }
 
 }
+
+
+
 
 int ip_route_input(struct sk_buff* skb,uint32_t dip,uint32_t sip)
 {
@@ -166,16 +173,75 @@ int ip_route_input(struct sk_buff* skb,uint32_t dip,uint32_t sip)
     return ip_route_input_slow(skb,dip,sip);
 }
 
-int ip_route_output(struct sk_buff* skb,uint32_t dip,uint32_t sip)
+
+int ip_route_output_slow(struct rtable** tar,struct flowi* fl)
 {
-    struct rtable * rtp = &rt_hash_table[0];
-    rtp->rt_dst = dip;
-    rtp->rt_src = sip;
+    fl->fl4_scope = RT_SCOPE_UNIVERSE;
 
-    skb->dst = (struct dst_entry *)rtp;
+    struct netdevice * dev_out = netdev_get();
+    struct fib_result res;
+    struct rtable * rth;
 
-    return 1;
+    if(!fib_find(&fl,&res))
+    {
+        puts("ERROR: route table!");
+    }
+
+    if(res.type == RTN_UNICAST)
+    {
+
+        rth = rt_alloc();
+
+        rth->dst.output = ip_output;
+
+        rth->fl.fl4_dst = fl->fl4_dst;
+        rth->fl.fl4_src = fl->fl4_src;
+        rth->rt_src = fl->fl4_src;
+        rth->rt_dst = fl->fl4_dst;
+        rth->rt_gateway = fl->fl4_dst;
+
+        rth->dst.dev = dev_out;
+
+        rth->fl.iif = 0;
+        rth->fl.oif = fl->oif;
+
+        rth->rt_type = res.type;
+
+        uint32_t hash = rt_hash(fl->fl4_dst,fl->fl4_src);
+
+
+
+        *tar = ip_rt_insert(hash,rth);
+        
+        return 1;
+    }
+
 }
+
+
+
+int ip_route_output(struct rtable** tar,struct flowi* fl)
+{
+    uint32_t hash = rt_hash(fl->fl4_dst,fl->fl4_src);
+    struct rtable* rth;
+    //lock
+    for(rth = rt_hash_table[hash].queue;rth;rth = rth->next)
+    {
+        if(rth->fl.fl4_dst == fl->fl4_dst &&
+            rth->fl.fl4_src == fl->fl4_src &&
+            rth->fl.iif == 0 &&
+            rth->fl.oif == fl->oif )
+            {
+                *tar = rth;
+                return 1;
+            }
+    }
+    //unlock
+
+    return ip_route_output_slow(tar,fl);
+}
+
+
 
 
 uint16_t ip_select_id(struct dst_entry * dst)

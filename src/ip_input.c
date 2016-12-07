@@ -98,17 +98,3 @@ int ip_io_error(struct sk_buff * skb)
 {
     puts("ERROR: dst io error");
 }
-
-
-
-
-int ip_forward(struct sk_buff * skb)
-{
-
-}
-
-
-int ip_output(struct sk_buff * skb)
-{
-
-}

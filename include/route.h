@@ -32,8 +32,8 @@ struct rtable
 int ip_rt_init();
 
 
-int ip_route_input(struct sk_buff* skb,uint32_t dip,uint32_t sip);  //mock function
-int ip_route_output(struct sk_buff* skb,uint32_t dip,uint32_t sip);
+int ip_route_input(struct sk_buff* skb,uint32_t dip,uint32_t sip);
+int ip_route_output(struct rtable** res,struct flowi* fl);
 
 
 

@@ -42,9 +42,9 @@ void ip_solve(struct sk_buff* skb);
 int ip_local_deliver(struct sk_buff * skb);
 int ip_io_error(struct sk_buff * skb);
 int ip_forward(struct sk_buff * skb);
-int ip_output(struct sk_buff * skb);
 
 
 int ip_send(struct sk_buff * skb);
+int ip_output(struct sk_buff * skb);
 
 #endif

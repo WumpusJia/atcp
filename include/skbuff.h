@@ -4,6 +4,7 @@
 #include "netdevice.h"
 #include "common.h"
 #include "dst.h"
+#include "sock.h"
 
 #define SKBUFF_ALLOC_DEFAULT 1
 #define SKBUFF_ALLOC_PARTIAL 0
@@ -25,6 +26,8 @@ struct sk_buff
 
     struct netdevice *dev;
     struct dst_entry * dst;
+    struct sock sk;
+
 
     struct sk_buff_head * list;
 

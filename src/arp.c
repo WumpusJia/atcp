@@ -66,12 +66,13 @@ void arp_init()
 
 int arp_bind_neighbour(struct dst_entry * dst)
 {
+
     struct neighbour* n = dst->neighbour;
+
     if(n == NULL)
     {
 
         uint32_t dstip = ((struct rtable*)dst)->rt_dst;
-
         n = neigh_lookup(&arp_tbl,&dstip);
         if(n == NULL) return 0;
         dst->neighbour = n;

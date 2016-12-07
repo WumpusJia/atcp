@@ -6,30 +6,15 @@
 #include "arp.h"
 
 
-int ip_send(struct sk_buff * skb) //skb->dst has been calculated
+
+int ip_forward(struct sk_buff * skb)
 {
 
-// ip_route_output() ----
+}
+int ip_output(struct sk_buff * skb)
+{
 
-
-
-
-
-    //todo Support ip option
-
-    struct rtable* rt = (struct rtable *)skb->dst;
-
-    // temporary
-    static int flag = 0;
-    if(!flag)
-    {
-        uint32_t tt = rt->rt_src;
-        rt->rt_src = rt->rt_dst;
-        rt->rt_dst = tt;
-        arp_bind_neighbour(skb->dst); //temporary here.  should be put into route subsystem
-        flag = 1;
-    }
-
+    struct rtable* rth = (struct rtable*) skb->dst;
     skb_push(skb,IP_HEADER_LEN);
 
     struct ip_header * hdr = get_ip_header(skb);
@@ -44,8 +29,8 @@ int ip_send(struct sk_buff * skb) //skb->dst has been calculated
     hdr->ttl = 64;
     hdr->protocol = skb->protocol;
 
-    hdr->srcip = rt->rt_src;
-    hdr->dstip = rt->rt_dst;
+    hdr->srcip = rth->rt_src;
+    hdr->dstip = rth->rt_dst;
 
     hdr->checksum = 0;
     reset_ip_header(hdr);
@@ -60,5 +45,32 @@ int ip_send(struct sk_buff * skb) //skb->dst has been calculated
 
 
     return n->ops->output(skb);
+}
 
+int ip_send(struct sk_buff * skb) //skb->dst has been calculated
+{
+
+    struct sock* sk = &skb->sk;
+
+
+    if(skb->dst == NULL)
+    {
+        struct flowi fl = {
+            .iif = 0,
+            .oif = sk->dev_if,
+            .un = {
+                .ip4= {
+                        .dstip = sk->dip,
+                        .srcip = sk->sip,
+                    },
+
+                },};
+
+        if(!ip_route_output(&skb->dst,&fl))
+        {
+            puts("ERROR: route output!");
+            return 0;
+        }
+    }
+    return skb->dst->output(skb);
 }

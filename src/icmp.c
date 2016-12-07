@@ -2,6 +2,7 @@
 #include "util.h"
 #include "ip.h"
 #include "ethernet.h"
+#include "route.h"
 
 struct icmp_header * get_icmp_header(struct sk_buff * skb)
 {
@@ -83,6 +84,16 @@ int icmp_echo_reply(struct sk_buff * skb)
     hdr->checksum = htons(hdr->checksum);
 
     skb->protocol = IP_ICMP;
+
+    struct rtable* rth = (struct rtable* )skb->dst;
+
+    skb->sk.sip = rth->rt_dst;
+    skb->sk.dip = rth->rt_src;
+
+    struct netdevice * dev = skb->dev;
+    skb->sk.dev_if = dev->ifindex;
+
+    skb->dst = NULL;
 
 
 
