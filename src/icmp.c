@@ -114,15 +114,9 @@ int icmp_echo_request(struct netdevice* dev,uint32_t dstip)
 
     skb->dev = dev;
 
-    if(skb->dst == NULL)
-    {
-        if(! ip_route_output(skb,dstip,dev->ip)) //route subsystem
-        {
-            puts("Route error : send failed");
-            return;
-        }
-
-    }
+    skb->sk.dip = dstip;
+    skb->sk.sip = dev->ip;
+    skb->sk.dev_if = dev->ifindex;
 
 
     struct icmp_header * hdr = get_icmp_header(skb);

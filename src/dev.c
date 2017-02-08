@@ -1,5 +1,6 @@
 #define NETMAP_WITH_LIBS
 #include "net/netmap_user.h"
+#include "net/netmap_my.h"
 #include "dev.h"
 #include "arp.h"
 #include "ethernet.h"
@@ -14,7 +15,8 @@ static struct nm_desc *_nmd_;
 void net_init(char *s)
 {
     char tmp[20];
-    sprintf(tmp,"netmap:%s",s);
+    sprintf(tmp,"netmap:%s*",s);
+
     _nmd_ = nm_open(tmp, NULL, 0, 0);
     if(_nmd_ == NULL)
     {
@@ -77,11 +79,17 @@ void net_rx_loop()
 
     fds.fd = NETMAP_FD(_nmd_);
     fds.events = POLLIN;
+    int ringid;
     while(1)
     {
-         poll(&fds, 1, -1);
-         while ( (buf = nm_nextpkt(_nmd_, &h)) )
-             process_pkt(buf, &h);
+        poll(&fds, 1, -1);
+        while ( (buf = my_nextpkt(_nmd_, &h,&ringid)) )
+        {
+            if(ringid == NIC_RING)
+                process_pkt(buf, &h);
+            else
+                printf("Todo: Host Ring\n");
+        }
      }
      nm_close(_nmd_);
 }
@@ -108,7 +116,7 @@ int net_tx_action(struct sk_buff* skb,uint8_t * dst_mac,uint16_t type)
     fds.events = POLLOUT;
     poll(&fds, 1, -1);
 
-    int res = nm_inject(_nmd_,(char*)skb->data,skb->len);
+    int res = nic_inject(_nmd_,(char*)skb->data,skb->len);
 
 
     free_skb(skb);

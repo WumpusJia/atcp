@@ -42,8 +42,9 @@ uint32_t fib_hash(uint32_t addr)
 
 int fib_find(struct flowi * fl,struct fib_result * res) //mock function
 {
-    uint32_t my = 192*256*256*256+168*256*256+1*256+143;
-    if(fl->fl4_dst == my)
+    //uint32_t my = 192*256*256*256+168*256*256+1*256+143; //tmp here
+    //if(fl->fl4_dst == my)
+    if(1)
     {
         res->type = RTN_LOCAL;
     }

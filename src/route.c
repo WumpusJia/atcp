@@ -113,7 +113,7 @@ int ip_route_input_slow(struct sk_buff* skb,uint32_t dip,uint32_t sip)
     uint32_t hash = rt_hash(dip,sip);
 
     //check multicast | boardcast | loopback ....
-
+    
     //query route table
     if(!fib_find(&fl,&res))
     {
@@ -176,6 +176,8 @@ int ip_route_input(struct sk_buff* skb,uint32_t dip,uint32_t sip)
 
 int ip_route_output_slow(struct rtable** tar,struct flowi* fl)
 {
+
+
     fl->fl4_scope = RT_SCOPE_UNIVERSE;
 
     struct netdevice * dev_out = netdev_get();
@@ -212,7 +214,7 @@ int ip_route_output_slow(struct rtable** tar,struct flowi* fl)
 
 
         *tar = ip_rt_insert(hash,rth);
-        
+
         return 1;
     }
 

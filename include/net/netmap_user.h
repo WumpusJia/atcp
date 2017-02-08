@@ -309,16 +309,16 @@ typedef void (*nm_cb_t)(u_char *, const struct nm_pkthdr *, const u_char *d);
  * ifname	(netmap:foo or vale:foo) is the port name
  *		a suffix can indicate the follwing:
  *		^		bind the host (sw) ring pair
- *		*		bind host and NIC ring pairs (transparent)
+ *		*		bind host and NIC ring pairs
  *		-NN		bind individual NIC ring pair
  *		{NN		bind master side of pipe NN
  *		}NN		bind slave side of pipe NN
  *		a suffix starting with / and the following flags,
  *		in any order:
  *		x		exclusive access
- *		z		zero copy monitor
- *		t		monitor tx side
- *		r		monitor rx side
+ *		z		zero copy monitor (both tx and rx)
+ *		t		monitor tx side (copy monitor)
+ *		r		monitor rx side (copy monitor)
  *		R		bind only RX ring(s)
  *		T		bind only TX ring(s)
  *
@@ -793,11 +793,6 @@ nm_open(const char *ifname, const struct nmreq *req,
 		snprintf(errmsg, MAXERRMSG, "unexpected end of port name");
 		goto fail;
 	}
-	if ((nr_flags & NR_ZCOPY_MON) &&
-	   !(nr_flags & (NR_MONITOR_TX|NR_MONITOR_RX))) {
-		snprintf(errmsg, MAXERRMSG, "'z' used but neither 'r', nor 't' found");
-		goto fail;
-	}
 	ND("flags: %s %s %s %s",
 			(nr_flags & NR_EXCLUSIVE) ? "EXCLUSIVE" : "",
 			(nr_flags & NR_ZCOPY_MON) ? "ZCOPY_MON" : "",
@@ -875,7 +870,7 @@ nm_open(const char *ifname, const struct nmreq *req,
 
 	nr_reg = d->req.nr_flags & NR_REG_MASK;
 
-	if (nr_reg ==  NR_REG_SW) { /* host stack */
+	if (nr_reg == NR_REG_SW) { /* host stack */
 		d->first_tx_ring = d->last_tx_ring = d->req.nr_tx_rings;
 		d->first_rx_ring = d->last_rx_ring = d->req.nr_rx_rings;
 	} else if (nr_reg ==  NR_REG_ALL_NIC) { /* only nic */
@@ -1081,11 +1076,13 @@ nm_nextpkt(struct nm_desc *d, struct nm_pkthdr *hdr)
 		/* compute current ring to use */
 		struct netmap_ring *ring = NETMAP_RXRING(d->nifp, ri);
 		if (!nm_ring_empty(ring)) {
+
 			u_int i = ring->cur;
 			u_int idx = ring->slot[i].buf_idx;
 			u_char *buf = (u_char *)NETMAP_BUF(ring, idx);
 
 			// __builtin_prefetch(buf);
+
 			hdr->ts = ring->ts;
 			hdr->len = hdr->caplen = ring->slot[i].len;
 			ring->cur = nm_ring_next(ring, i);

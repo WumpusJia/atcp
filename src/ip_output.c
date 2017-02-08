@@ -47,7 +47,7 @@ int ip_output(struct sk_buff * skb)
     return n->ops->output(skb);
 }
 
-int ip_send(struct sk_buff * skb) //skb->dst has been calculated
+int ip_send(struct sk_buff * skb) 
 {
 
     struct sock* sk = &skb->sk;
