@@ -9,6 +9,7 @@
 #define SKBUFF_ALLOC_DEFAULT 1
 #define SKBUFF_ALLOC_PARTIAL 0
 
+struct sk_buff; //Declare to aviod warnings
 
 struct sk_buff_head
 {

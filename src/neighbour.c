@@ -4,10 +4,11 @@
 #include "dev.h"
 
 
-static struct neightbour * neigh_alloc(struct neigh_table * tbl,const void* key)
+
+static struct neighbour * neigh_alloc(struct neigh_table * tbl,const void* key)
 {
-    struct neighbour * n;
-    n = malloc(sizeof(struct neighbour));
+    struct neighbour *n;
+    n = (struct neighbour *)malloc(sizeof(struct neighbour));
     n->tbl = tbl;
 
     n->nud_state = NUD_NONE;
@@ -33,8 +34,8 @@ static struct neightbour * neigh_alloc(struct neigh_table * tbl,const void* key)
 static struct neighbour ** neigh_hash_alloc(unsigned int nums)
 {
     unsigned long size = nums * sizeof(struct neighbour *);
-    struct neighbour ** res = malloc(size);
-    memset(res,NULL,size);
+    struct neighbour ** res = (struct neighbour **)malloc(size);
+    memset(res,0,size);
     return res;
 }
 
@@ -193,7 +194,7 @@ int neigh_event_rcv(struct neigh_table * tbl,uint8_t * mac,void* ip)
         }
 
     }
-    return n;
+    return n != NULL;
 
 }
 

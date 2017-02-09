@@ -4,6 +4,9 @@
 
 #include "netdevice.h"
 
+
+struct sk_buff; //Declare to aviod warnings
+
 struct dst_entry
 {
     struct netdevice *dev;

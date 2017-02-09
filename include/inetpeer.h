@@ -9,7 +9,7 @@ Need datastructure : AVL. To support quick find/edit operator
 
 
 */
-
+struct rtable; //Declare to aviod warnings
 
 struct inet_peer
 {

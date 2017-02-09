@@ -9,7 +9,7 @@
 #include "flow.h"
 
 
-
+struct inet_peer; //Declare to aviod warnings
 
 struct rtable
 {
@@ -30,7 +30,7 @@ struct rtable
 
 
 int ip_rt_init();
-
+uint16_t ip_select_id(struct dst_entry * dst);
 
 int ip_route_input(struct sk_buff* skb,uint32_t dip,uint32_t sip);
 int ip_route_output(struct rtable** res,struct flowi* fl);

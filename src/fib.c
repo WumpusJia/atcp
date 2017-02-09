@@ -7,7 +7,7 @@ static struct fib_table * ip_fib_table;
 uint32_t fib_hash(uint32_t addr)
 {
     uint32_t res = 0;
-    uint8_t *p = &addr;
+    uint8_t *p = (uint8_t *)&addr;
     for(int i = 0;i < 4;++i)
     {
         res = (res*FIB_HASH_BASE+(*p))%FIB_HASH_MOD;
@@ -42,9 +42,8 @@ uint32_t fib_hash(uint32_t addr)
 
 int fib_find(struct flowi * fl,struct fib_result * res) //mock function
 {
-    //uint32_t my = 192*256*256*256+168*256*256+1*256+143; //tmp here
-    //if(fl->fl4_dst == my)
-    if(1)
+    uint32_t my = 192*256*256*256+168*256*256+1*256+2; //tmp here
+    if(fl->fl4_dst == my)
     {
         res->type = RTN_LOCAL;
     }
@@ -63,7 +62,7 @@ struct fib_table * fib_hash_init(int id)
     tb = malloc(sizeof(struct fib_table));
 
     tb->id = id;
-    memset(tb->zone,NULL,sizeof(tb->zone));
+    memset(tb->zone,0,sizeof(tb->zone));
     tb->zone_list = NULL;
 
 }

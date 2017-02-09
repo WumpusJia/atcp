@@ -47,6 +47,8 @@ struct arp_cache_node
     uint8_t mac[ETH_MAC_LEN];
 };
 
+void arp_init();
+
 int arp_bind_neighbour(struct dst_entry * dst);
 
 int arp_reply(struct sk_buff* skb);

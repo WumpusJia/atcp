@@ -45,7 +45,7 @@ void icmp_solve(struct sk_buff * skb)
     if(checksum(hdr,skb->len/2))
     {
         puts("ICMP Checksum failed!");
-        return 0;
+        return;
     }
 
     init_icmp_header(hdr);
@@ -95,7 +95,7 @@ int icmp_echo_reply(struct sk_buff * skb)
 
     skb->dst = NULL;
 
-
+    
 
     return ip_send(skb);
 

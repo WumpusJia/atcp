@@ -22,6 +22,29 @@
 
 #define IP_MAX_LEN 16
 
+
+
+struct neigh_ops
+{
+    int (*output) (struct sk_buff*);
+    int (*request) (void *ip);
+};
+
+struct neigh_table
+{
+    int key_len;
+    uint32_t (*hash) (const void *);
+    int (*constructor) (struct neighbour* );
+
+    struct neighbour ** hash_buckets;
+    uint32_t hash_size;
+    uint32_t hash_max_size;
+
+    uint32_t now_size;
+    pthread_rwlock_t lock;
+
+};
+
 struct neighbour
 {
 
@@ -42,27 +65,6 @@ struct neighbour
     pthread_rwlock_t lock;
 };
 
-
-struct neigh_ops
-{
-    int (*output) (struct sk_buff*);
-    int (*request) (void *ip);
-};
-
-struct neigh_table
-{
-    int key_len;
-    uint32_t (*hash) (void *);
-    int (*constructor) (struct neighbour* );
-
-    struct neighbour ** hash_buckets;
-    uint32_t hash_size;
-    uint32_t hash_max_size;
-
-    uint32_t now_size;
-    pthread_rwlock_t lock;
-
-};
 
 void neigh_table_init(struct neigh_table * tbl);
 

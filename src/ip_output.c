@@ -47,7 +47,7 @@ int ip_output(struct sk_buff * skb)
     return n->ops->output(skb);
 }
 
-int ip_send(struct sk_buff * skb) 
+int ip_send(struct sk_buff * skb)
 {
 
     struct sock* sk = &skb->sk;
@@ -55,6 +55,7 @@ int ip_send(struct sk_buff * skb)
 
     if(skb->dst == NULL)
     {
+        
         struct flowi fl = {
             .iif = 0,
             .oif = sk->dev_if,
@@ -66,7 +67,7 @@ int ip_send(struct sk_buff * skb)
 
                 },};
 
-        if(!ip_route_output(&skb->dst,&fl))
+        if(!ip_route_output((struct rtable**)&skb->dst,&fl))
         {
             puts("ERROR: route output!");
             return 0;

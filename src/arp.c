@@ -2,7 +2,7 @@
 #include "common.h"
 #include "neighbour.h"
 #include "route.h"
-
+#include "dev.h"
 
 
 
@@ -11,10 +11,10 @@
 #define ARP_HASH_MOD 233
 #define ARP_HASH_MAX_SIZE 100
 
-uint32_t arp_hash(void *key)
+uint32_t arp_hash(const void *key)
 {
     uint32_t res = 0;
-    uint8_t *p = key;
+    const uint8_t *p = (const uint8_t *)key;
     for(int i = 0;i < 4;++i)
     {
         res = (res*ARP_HASH_BASE+(*p))%ARP_HASH_MOD;

@@ -4,6 +4,7 @@
 #include "neighbour.h"
 #include "ip.h"
 #include "netdevice.h"
+#include "arp.h"
 
 #define RTABLE_HASH_MOD 233
 #define RTABLE_HASH_BASE 57
@@ -28,13 +29,13 @@ int ip_rt_init()
 uint32_t rt_hash(uint32_t daddr,uint32_t saddr)
 {
     uint32_t res = 0;
-    uint8_t *p = &daddr;
+    uint8_t *p = (uint8_t *)&daddr;
     for(int i = 0;i < 4;++i)
     {
         res = (res*RTABLE_HASH_BASE+(*p))%RTABLE_HASH_MOD;
         p++;
     }
-    p = &saddr;
+    p = (uint8_t *)&saddr;
     for(int i = 0;i < 4;++i)
     {
         res = (res*RTABLE_HASH_BASE+(*p))%RTABLE_HASH_MOD;
@@ -113,7 +114,7 @@ int ip_route_input_slow(struct sk_buff* skb,uint32_t dip,uint32_t sip)
     uint32_t hash = rt_hash(dip,sip);
 
     //check multicast | boardcast | loopback ....
-    
+
     //query route table
     if(!fib_find(&fl,&res))
     {
@@ -184,14 +185,14 @@ int ip_route_output_slow(struct rtable** tar,struct flowi* fl)
     struct fib_result res;
     struct rtable * rth;
 
-    if(!fib_find(&fl,&res))
+    if(!fib_find(fl,(struct fib_result*)&res))
     {
         puts("ERROR: route table!");
     }
 
     if(res.type == RTN_UNICAST)
     {
-
+            
         rth = rt_alloc();
 
         rth->dst.output = ip_output;
