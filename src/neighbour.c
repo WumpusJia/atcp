@@ -118,12 +118,35 @@ int neigh_update(struct neighbour* neigh,uint8_t * mac,uint8_t new)
     return 1;
 }
 
-void neigh_free(struct neigh_table * tbl,struct neighbour * n)
+void neigh_free(struct neighbour * n)
 {
-    //todo
-
+    neigh_queue_free(n);
+    if(n->ops)
+    {
+        //todo
+    }
+    pthread_rwlock_destroy(&n->lock);
+    free(n);
 }
 
+void neigh_hash_free(struct neighbour* n)
+{
+    while(n != NULL)
+    {
+        struct neighbour* tn = n->next;
+        neigh_free(n);
+        n = tn;
+    }
+}
+
+void neigh_table_destructor(struct neigh_table* tbl)
+{
+    for(int i = 0;i < tbl->hash_size;++i)
+    {
+        neigh_hash_free(tbl->hash_buckets[i]);
+    }
+    pthread_rwlock_destroy(&tbl->lock);
+}
 
 /////////////////////////////////////////////
 
@@ -131,30 +154,30 @@ void neigh_free(struct neigh_table * tbl,struct neighbour * n)
 
 void neigh_queue_push_front(struct neighbour* neigh,struct sk_buff * skb)
 {
-    pthread_rwlock_wrlock(&neigh->lock);
+    //pthread_rwlock_wrlock(&neigh->lock);
     skb_queue_push_front(&neigh->queue,skb);
-    pthread_rwlock_unlock(&neigh->lock);
+//    pthread_rwlock_unlock(&neigh->lock);
 }
 void neigh_queue_push_back(struct neighbour* neigh,struct sk_buff * skb)
 {
-    pthread_rwlock_wrlock(&neigh->lock);
+//    pthread_rwlock_wrlock(&neigh->lock);
     skb_queue_push_back(&neigh->queue,skb);
-    pthread_rwlock_unlock(&neigh->lock);
+    //pthread_rwlock_unlock(&neigh->lock);
 }
 struct sk_buff * neigh_queue_pop_front(struct neighbour* neigh)
 {
     struct sk_buff * res = NULL;
-    pthread_rwlock_wrlock(&neigh->lock);
+    //pthread_rwlock_wrlock(&neigh->lock);
     res = skb_queue_pop_front(&neigh->queue);
-    pthread_rwlock_unlock(&neigh->lock);
+//    pthread_rwlock_unlock(&neigh->lock);
     return res;
 }
 struct sk_buff * neigh_queue_pop_back(struct neighbour* neigh)
 {
     struct sk_buff * res = NULL;
-    pthread_rwlock_wrlock(&neigh->lock);
+    //pthread_rwlock_wrlock(&neigh->lock);
     res = skb_queue_pop_back(&neigh->queue);
-    pthread_rwlock_unlock(&neigh->lock);
+    //pthread_rwlock_unlock(&neigh->lock);
     return res;
 }
 

@@ -48,7 +48,7 @@ struct arp_cache_node
 };
 
 void arp_init();
-
+void arp_free();
 int arp_bind_neighbour(struct dst_entry * dst);
 
 int arp_reply(struct sk_buff* skb);

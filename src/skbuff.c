@@ -96,12 +96,14 @@ void skb_queue_init(struct sk_buff_head * list)
     list->prev = (struct sk_buff *)list;
     list->next = (struct sk_buff *)list;
     list->len = 0;
+    pthread_mutex_init(&list->lock,NULL);
 }
 
 
 
 void skb_queue_push_front(struct sk_buff_head * list,struct sk_buff * skb)
 {
+    pthread_mutex_lock(&list->lock);
     skb->list = list;
 
     struct sk_buff * tprev = (struct sk_buff *)list;
@@ -114,11 +116,12 @@ void skb_queue_push_front(struct sk_buff_head * list,struct sk_buff * skb)
     tnext->prev = skb;
 
     list->len++;
-
+    pthread_mutex_unlock(&list->lock);
 }
 
 void skb_queue_push_back(struct sk_buff_head * list,struct sk_buff * skb)
 {
+    pthread_mutex_lock(&list->lock);
     skb->list = list;
 
     struct sk_buff * tnext = (struct sk_buff *)list;
@@ -131,15 +134,20 @@ void skb_queue_push_back(struct sk_buff_head * list,struct sk_buff * skb)
     tnext->prev = skb;
 
     list->len++;
-
+    pthread_mutex_unlock(&list->lock);
 }
 
 
 struct sk_buff * skb_queue_pop_front(struct sk_buff_head *list)
 {
+    pthread_mutex_lock(&list->lock);
     struct sk_buff * tprev = (struct sk_buff*) list;
     struct sk_buff * res = list->next;
-    if(tprev == res) return NULL;
+    if(tprev == res)
+    {
+        pthread_mutex_unlock(&list->lock);
+        return NULL;
+    }
 
     struct sk_buff * tnext = res->next;
     tprev->next = tnext;
@@ -149,17 +157,21 @@ struct sk_buff * skb_queue_pop_front(struct sk_buff_head *list)
     res->next = NULL;
     res->prev = NULL;
     res->list = NULL;
-
+    pthread_mutex_unlock(&list->lock);
     return res;
 }
 
 
 struct sk_buff * skb_queue_pop_back(struct sk_buff_head *list)
 {
+    pthread_mutex_lock(&list->lock);
     struct sk_buff * tnext = (struct sk_buff*) list;
     struct sk_buff * res = list->prev;
-    if(tnext == res) return NULL;
-
+    if(tnext == res)
+    {
+        pthread_mutex_unlock(&list->lock);
+        return NULL;
+    }
     struct sk_buff * tprev = res->prev;
     tprev->next = tnext;
     tnext->prev = tprev;
@@ -168,6 +180,6 @@ struct sk_buff * skb_queue_pop_back(struct sk_buff_head *list)
     res->next = NULL;
     res->prev = NULL;
     res->list = NULL;
-
+    pthread_mutex_unlock(&list->lock);
     return res;
 }

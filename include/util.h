@@ -5,8 +5,7 @@
 
 #define CMD_MAX_LEN 256
 int my_cmd_run(char* format, ...);
-void hex_print(char *s,int len);
-
+void ipv4_print(uint32_t addr);
 uint16_t checksum(void *s,int len);
 
 #endif

@@ -16,6 +16,7 @@ struct sk_buff_head
     struct sk_buff * next;
     struct sk_buff * prev;
     uint32_t len;
+    pthread_mutex_t lock;
 };
 
 

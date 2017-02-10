@@ -56,9 +56,11 @@ void icmp_solve(struct sk_buff * skb)
             icmp_echo_reply(skb);
             break;
         case ICMP_ECHO_REPLY:
+            free_skb(skb);
             puts("Received echo reply");
             break;
         default:
+            free_skb(skb);
             puts("Unknown ICMP TYPE");
             break;
     }
@@ -95,7 +97,7 @@ int icmp_echo_reply(struct sk_buff * skb)
 
     skb->dst = NULL;
 
-    
+
 
     return ip_send(skb);
 

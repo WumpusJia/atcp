@@ -26,6 +26,23 @@ int ip_rt_init()
     }
 }
 
+
+void ip_rt_free()
+{
+    for(int i = 0;i < RTABLE_HASH_MOD;++i)
+    {
+        struct rtable* now = rt_hash_table[i].queue;
+        while(now != NULL)
+        {
+            struct rtable *tmp = now->next;
+            rt_free(now);
+            now = tmp;
+        }
+
+        pthread_rwlock_destroy(&rt_hash_table[i].lock);
+    }
+}
+
 uint32_t rt_hash(uint32_t daddr,uint32_t saddr)
 {
     uint32_t res = 0;
@@ -49,7 +66,7 @@ struct rtable* ip_rt_insert(uint32_t hash,struct rtable* now)
 {
     struct rtable* rth;
 
-    //lock
+    pthread_rwlock_rdlock(&rt_hash_table[hash].lock);
     for(rth = rt_hash_table[hash].queue;rth;rth = rth->next)
     {
         if(rth->fl.fl4_dst == now->fl.fl4_dst &&
@@ -57,11 +74,12 @@ struct rtable* ip_rt_insert(uint32_t hash,struct rtable* now)
             rth->fl.iif == now->fl.iif &&
             rth->fl.oif == now->fl.oif )
             {
+                pthread_rwlock_unlock(&rt_hash_table[hash].lock);
                 return rth;
             }
     }
 
-
+    pthread_rwlock_unlock(&rt_hash_table[hash].lock);
 
     if(now->rt_type == RTN_UNICAST || now->fl.iif == 0)
     {
@@ -69,10 +87,10 @@ struct rtable* ip_rt_insert(uint32_t hash,struct rtable* now)
         arp_bind_neighbour((struct dst_entry *)now);
 
     }
-
+    pthread_rwlock_wrlock(&rt_hash_table[hash].lock);
     now->next = rt_hash_table[hash].queue;
     rt_hash_table[hash].queue = now;
-
+    pthread_rwlock_unlock(&rt_hash_table[hash].lock);
     return now;
 }
 
@@ -94,6 +112,15 @@ struct rtable * rt_alloc()
     rt->next = NULL;
 
     return rt;
+}
+
+void rt_free(struct rtable* rt)
+{
+    if(rt->peer) //todo
+    {
+
+    }
+    free(rt);
 }
 
 
@@ -145,6 +172,28 @@ int ip_route_input_slow(struct sk_buff* skb,uint32_t dip,uint32_t sip)
 
         return 1;
     }
+    else //tmp here
+    {
+        rth = rt_alloc();
+
+        rth->dst.input = ip_io_error;
+
+        rth->fl.fl4_dst = dip;
+        rth->fl.fl4_src = sip;
+        rth->rt_src = sip;
+        rth->rt_dst = dip;
+        rth->rt_gateway = dip;
+
+        rth->dst.dev = dev;
+
+        rth->fl.iif = dev->ifindex;
+        rth->fl.oif = 0;
+
+        rth->rt_type = res.type;
+
+        skb->dst = (struct dst_entry * )ip_rt_insert(hash,rth);
+        return 1;
+    }
 
 }
 
@@ -157,7 +206,7 @@ int ip_route_input(struct sk_buff* skb,uint32_t dip,uint32_t sip)
     uint32_t iif = skb->dev->ifindex;
     struct rtable* rth;
 
-    //lock
+    pthread_rwlock_rdlock(&rt_hash_table[hash].lock);
     for(rth = rt_hash_table[hash].queue;rth;rth = rth->next)
     {
         if(rth->fl.fl4_dst == dip &&
@@ -166,10 +215,11 @@ int ip_route_input(struct sk_buff* skb,uint32_t dip,uint32_t sip)
             rth->fl.oif == 0 )
             {
                 skb->dst = (struct dst_entry *)rth;
+                pthread_rwlock_unlock(&rt_hash_table[hash].lock);
                 return 1;
             }
     }
-    //unlock
+    pthread_rwlock_unlock(&rt_hash_table[hash].lock);
 
     return ip_route_input_slow(skb,dip,sip);
 }
@@ -192,10 +242,37 @@ int ip_route_output_slow(struct rtable** tar,struct flowi* fl)
 
     if(res.type == RTN_UNICAST)
     {
-            
+
         rth = rt_alloc();
 
         rth->dst.output = ip_output;
+
+        rth->fl.fl4_dst = fl->fl4_dst;
+        rth->fl.fl4_src = fl->fl4_src;
+        rth->rt_src = fl->fl4_src;
+        rth->rt_dst = fl->fl4_dst;
+        rth->rt_gateway = fl->fl4_dst;
+
+        rth->dst.dev = dev_out;
+
+        rth->fl.iif = 0;
+        rth->fl.oif = fl->oif;
+
+        rth->rt_type = res.type;
+
+        uint32_t hash = rt_hash(fl->fl4_dst,fl->fl4_src);
+
+
+
+        *tar = ip_rt_insert(hash,rth);
+
+        return 1;
+    }
+    else //tmp here
+    {
+        rth = rt_alloc();
+
+        rth->dst.output = ip_io_error;
 
         rth->fl.fl4_dst = fl->fl4_dst;
         rth->fl.fl4_src = fl->fl4_src;
@@ -227,7 +304,7 @@ int ip_route_output(struct rtable** tar,struct flowi* fl)
 {
     uint32_t hash = rt_hash(fl->fl4_dst,fl->fl4_src);
     struct rtable* rth;
-    //lock
+    pthread_rwlock_rdlock(&rt_hash_table[hash].lock);
     for(rth = rt_hash_table[hash].queue;rth;rth = rth->next)
     {
         if(rth->fl.fl4_dst == fl->fl4_dst &&
@@ -236,10 +313,11 @@ int ip_route_output(struct rtable** tar,struct flowi* fl)
             rth->fl.oif == fl->oif )
             {
                 *tar = rth;
+                pthread_rwlock_unlock(&rt_hash_table[hash].lock);
                 return 1;
             }
     }
-    //unlock
+    pthread_rwlock_unlock(&rt_hash_table[hash].lock);
 
     return ip_route_output_slow(tar,fl);
 }

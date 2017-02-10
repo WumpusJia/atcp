@@ -35,6 +35,7 @@ uint16_t ip_select_id(struct dst_entry * dst);
 int ip_route_input(struct sk_buff* skb,uint32_t dip,uint32_t sip);
 int ip_route_output(struct rtable** res,struct flowi* fl);
 
-
+void rt_free(struct rtable* rt);
+void ip_rt_free();
 
 #endif

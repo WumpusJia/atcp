@@ -24,6 +24,18 @@ void hex_print(char *s,int len)
 }
 
 
+void ipv4_print(uint32_t addr)
+{
+    int tmp[4];
+    for(int i = 0;i < 4;++i)
+    {
+        tmp[i] = addr % 256;
+        addr /= 256;
+    }
+    for(int i = 3;i >= 0;--i)
+        printf("%d%c",tmp[i]," \n"[i == 0]);
+}
+
 
 
 uint16_t checksum(void *s,int len)

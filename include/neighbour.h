@@ -65,8 +65,9 @@ struct neighbour
     pthread_rwlock_t lock;
 };
 
-
 void neigh_table_init(struct neigh_table * tbl);
+void neigh_table_destructor(struct neigh_table* tbl);
+
 
 int neigh_output(struct sk_buff * skb);
 struct neighbour* neigh_lookup(struct neigh_table * tbl,const void* key);
@@ -80,4 +81,5 @@ void neigh_queue_free(struct neighbour * neigh);
 
 int neigh_event_rcv(struct neigh_table * tbl,uint8_t * mac,void* ip);
 int neigh_event_send(struct neighbour * neigh,struct sk_buff * skb);
+
 #endif

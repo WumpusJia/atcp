@@ -15,6 +15,7 @@
 #include<stdint.h>
 #include<arpa/inet.h>
 #include<assert.h>
+#include<signal.h>
 #include<unistd.h>
 #include<pthread.h>
 

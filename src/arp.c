@@ -61,7 +61,10 @@ void arp_init()
     neigh_table_init(&arp_tbl);
 }
 
-
+void arp_free()
+{
+    neigh_table_destructor(&arp_tbl);
+}
 
 
 int arp_bind_neighbour(struct dst_entry * dst)
@@ -144,9 +147,11 @@ void arp_rcv(struct sk_buff* skb)
             arp_reply(skb);
             break;
         case OP_ARP_REPLY:
+            free_skb(skb);
             puts("RECEIVE ARP  REPLY");
             break;
         default:
+            free_skb(skb);
             puts("Unknown ARP");
             break;
 

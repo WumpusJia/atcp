@@ -5,6 +5,7 @@
 #include "icmp.h"
 
 
+
 struct ip_header * get_ip_header(struct sk_buff* skb)
 {
     return (struct ip_header *)skb->data;
@@ -68,7 +69,7 @@ void ip_solve(struct sk_buff* skb)
 
     }
 
-
+    puts("IP INPUT ROUTE");
 
     skb->dst->input(skb);
 
@@ -80,6 +81,7 @@ int ip_local_deliver(struct sk_buff * skb)
     switch(hdr->protocol)
     {
         case IP_TCP:
+            free_skb(skb);
             puts("Solve TCP");
             break;
         case IP_ICMP:
@@ -87,14 +89,25 @@ int ip_local_deliver(struct sk_buff * skb)
             icmp_solve(skb);
             break;
         default:
+            free_skb(skb);
             puts("Unknown IP datagram");
             break;
 
     }
 }
 
-
+#include "util.h"
+#include "fib.h"
 int ip_io_error(struct sk_buff * skb)
 {
     puts("ERROR: dst io error");
+
+    struct rtable * rth = (struct rtable*)skb->dst;
+    uint32_t dip = rth->fl.fl4_dst = dip;
+    uint32_t sip = rth->fl.fl4_src = sip;
+    puts("Error sip");
+    ipv4_print(sip);
+    puts("Error dip");
+    ipv4_print(dip);
+    free_skb(skb);
 }

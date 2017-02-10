@@ -9,8 +9,8 @@
 #include "netdevice.h"
 
 static struct nm_desc *_nmd_;
-
-
+// static struct sk_buff_head rx_queue;
+// static struct sk_buff_head tx_queue;
 
 void net_init(char *s)
 {
@@ -24,8 +24,16 @@ void net_init(char *s)
         exit(1);
     }
 
+    // skb_queue_init(&rx_queue);
+    // skb_queue_init(&tx_queue);
+
 }
 
+
+void net_free()
+{
+    nm_close(_nmd_);
+}
 
 
 void netif_receive_skb(struct sk_buff* skb)
@@ -45,14 +53,28 @@ void netif_receive_skb(struct sk_buff* skb)
             ip_solve(skb);
             break;
         case ETH_P_IPV6:
+            free_skb(skb);
             puts("Unsupport ipv6");
             break;
         default:
+            free_skb(skb);
             puts("Unknown packet");
             break;
     }
 }
 
+
+
+// void consume_rx_pkt_loop()
+// {
+//     while(1)
+//     {
+//         struct sk_buff * now = skb_queue_pop_front(&rx_queue);
+//         if(now != NULL)
+//             netif_receive_skb(now);
+//     }
+//
+// }
 
 
 static void process_pkt(char*buf,struct nm_pkthdr* p)
@@ -66,6 +88,7 @@ static void process_pkt(char*buf,struct nm_pkthdr* p)
     skb->dev = netdev_get();
     gettimeofday(&skb->stamp,NULL);
 
+    //skb_queue_push_back(&rx_queue,skb);
     netif_receive_skb(skb);
 
 }
@@ -80,15 +103,21 @@ void net_rx_loop()
     fds.fd = NETMAP_FD(_nmd_);
     fds.events = POLLIN;
     int ringid;
+
     while(1)
     {
+        pthread_testcancel();
         poll(&fds, 1, -1);
+
         while ( (buf = my_nextpkt(_nmd_, &h,&ringid)) )
         {
+            pthread_testcancel();
+
             if(ringid == NIC_RING)
                 process_pkt(buf, &h);
             else
                 printf("Todo: Host Ring\n");
+
         }
      }
      nm_close(_nmd_);
